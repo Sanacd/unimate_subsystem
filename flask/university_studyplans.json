@@ -1,0 +1,160 @@
+{
+  "metadata": {
+    "university": "University of Prince Muqrin",
+    "created_at": "2025-10-20T18:00:00Z",
+    "dataset_version": "1.0"
+  },
+  "programs": {
+    "BS Software Engineering": {
+      "version": "ABET September 2024",
+      "total_credit_hours": 132,
+      "levels": {
+        "1": [
+          {"course_code": "MATH101", "title": "Calculus I", "credits": 4, "prerequisite": "MATH002", "type": "Department", "requirement": "Required"},
+          {"course_code": "PHYS101", "title": "General Physics I", "credits": 4, "prerequisite": "MATH002", "type": "Department", "requirement": "Required"},
+          {"course_code": "CS111", "title": "Introduction to Computing and Programming", "credits": 4, "prerequisite": "PCS001", "type": "College", "requirement": "Required"},
+          {"course_code": "ENGL101", "title": "First Year Composition", "credits": 3, "prerequisite": "ENGL005", "type": "Institution", "requirement": "Required"},
+          {"course_code": "GIAS101", "title": "Islamic Culture", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required"}
+        ],
+        "2": [
+          {"course_code": "MATH102", "title": "Calculus II", "credits": 4, "prerequisite": "MATH101", "type": "Department", "requirement": "Required"},
+          {"course_code": "PHYS102", "title": "General Physics II", "credits": 4, "prerequisite": "PHYS101", "type": "Department", "requirement": "Required"},
+          {"course_code": "CS112", "title": "Object Oriented Programming", "credits": 4, "prerequisite": "CS111", "type": "College", "requirement": "Required"},
+          {"course_code": "ENGL102", "title": "Introduction to Report Writing", "credits": 3, "prerequisite": "ENGL101", "type": "Institution", "requirement": "Required"},
+          {"course_code": "GIAS102", "title": "Arabic Language Skills", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required"}
+        ],
+        "3": [
+          {"course_code": "ENGL201", "title": "Technical Writing", "credits": 3, "prerequisite": "ENGL102", "type": "Institution", "requirement": "Required"},
+          {"course_code": "CS351", "title": "Fundamentals of Database Systems", "credits": 4, "prerequisite": "CS112", "type": "Department", "requirement": "Required"},
+          {"course_code": "CS201", "title": "Introduction to Discrete Systems", "credits": 3, "prerequisite": "MATH102", "type": "College", "requirement": "Required"},
+          {"course_code": "CS211", "title": "Data Structures and Algorithms", "credits": 4, "prerequisite": "CS112", "type": "Department", "requirement": "Required"},
+          {"course_code": "MATH201", "title": "Differential Equations", "credits": 3, "prerequisite": "MATH102", "type": "Department", "requirement": "Required"}
+        ],
+        "4": [
+          {"course_code": "MATH202", "title": "Calculus III", "credits": 3, "prerequisite": "MATH102", "type": "Department", "requirement": "Required"},
+          {"course_code": "STAT232", "title": "Probability and Statistics", "credits": 3, "prerequisite": "MATH102", "type": "Department", "requirement": "Required"},
+          {"course_code": "CS224", "title": "Computer Architecture and Organization", "credits": 3, "prerequisite": "CS201", "type": "College", "requirement": "Required"},
+          {"course_code": "SE262", "title": "Software Engineering", "credits": 3, "prerequisite": "CS112", "type": "Department", "requirement": "Required"},
+          {"course_code": "GHALxxx", "title": "Humanities, Arts, and Languages Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+        ],
+        "5": [
+          {"course_code": "MATH204", "title": "Linear Algebra", "credits": 3, "prerequisite": "MATH102", "type": "Department", "requirement": "Required"},
+          {"course_code": "CS221", "title": "Fundamentals of Operating Systems", "credits": 4, "prerequisite": "CS211, CS224", "type": "College", "requirement": "Required"},
+          {"course_code": "SE464", "title": "Software Project Management", "credits": 3, "prerequisite": "SE262", "type": "Department", "requirement": "Required"},
+          {"course_code": "SE311", "title": "Software Requirements Engineering", "credits": 3, "prerequisite": "SE262", "type": "Department", "requirement": "Required"},
+          {"course_code": "SE323", "title": "Software Process and Modeling", "credits": 4, "prerequisite": "SE262", "type": "Department", "requirement": "Required"}
+        ],
+        "6": [
+          {"course_code": "SE342", "title": "Software Architecture and Design", "credits": 3, "prerequisite": "SE323", "type": "Department", "requirement": "Required"},
+          {"course_code": "CS232", "title": "Computer Networks", "credits": 4, "prerequisite": "CS112", "type": "College", "requirement": "Required"},
+          {"course_code": "SE463", "title": "Software Testing and Validation", "credits": 3, "prerequisite": "SE311", "type": "Department", "requirement": "Required"},
+          {"course_code": "SE324", "title": "Software Construction", "credits": 3, "prerequisite": "SE323", "type": "Department", "requirement": "Required"},
+          {"course_code": "SE372", "title": "Software Engineering Ethics and Professionalism", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+          {"course_code": "SE394", "title": "Field Experience / Internship", "credits": 1, "prerequisite": "Year 3 Core Courses", "type": "Department", "requirement": "Required"}
+        ],
+        "7": [
+          {"course_code": "SE491", "title": "Capstone Project I", "credits": 3, "prerequisite": "SE394", "type": "Department", "requirement": "Required"},
+          {"course_code": "SE431", "title": "Software Maintenance and Evolution", "credits": 3, "prerequisite": "SE262", "type": "Department", "requirement": "Required"},
+          {"course_code": "GIASxxx", "title": "Islamic Studies", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required"},
+          {"course_code": "SExxx", "title": "Professional Elective I", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"},
+          {"course_code": "SExxx", "title": "Professional Elective II", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"}
+        ],
+        "8": [
+          {"course_code": "SE492", "title": "Capstone Project II", "credits": 3, "prerequisite": "SE491", "type": "Department", "requirement": "Required"},
+          {"course_code": "GSOSxxx", "title": "Social Sciences Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"},
+          {"course_code": "SE472", "title": "Software Security", "credits": 3, "prerequisite": "CS332", "type": "Department", "requirement": "Required"},
+          {"course_code": "SExxx", "title": "Professional Elective III", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"},
+          {"course_code": "SExxx", "title": "Professional Elective IV", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"}
+        ]
+      }
+    },
+    "BS in Artificial Intelligence and Data Science": {
+      "version": "Updated 2025 V3",
+      "total_credit_hours": 132,
+      "levels": {
+        "1": [
+          {"course_code": "MATH101", "title": "Calculus I", "credits": 4, "prerequisite": "MATH002", "type": "Department", "requirement": "Required"},
+          {"course_code": "GIAS101", "title": "Islamic Culture", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required"},
+          {"course_code": "CS111", "title": "Introduction to Computing and Programming", "credits": 4, "prerequisite": "PCS001", "type": "College", "requirement": "Required"},
+          {"course_code": "ENGL101", "title": "First Year Composition", "credits": 3, "prerequisite": "ENGL005", "type": "Institution", "requirement": "Required"},
+          {"course_code": "PHYS111", "title": "Introduction to Physics", "credits": 3, "prerequisite": "MATH002", "type": "Department", "requirement": "Required"}
+        ],
+        "2": [
+          {"course_code": "MATH102", "title": "Calculus II", "credits": 4, "prerequisite": "MATH101", "type": "Department", "requirement": "Required"},
+          {"course_code": "GIAS102", "title": "Arabic Language Skills", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required"},
+          {"course_code": "CS112", "title": "Object Oriented Programming", "credits": 4, "prerequisite": "CS111", "type": "College", "requirement": "Required"},
+          {"course_code": "ENGL102", "title": "Introduction to Report Writing", "credits": 3, "prerequisite": "ENGL101", "type": "Institution", "requirement": "Required"},
+          {"course_code": "SE262", "title": "Software Engineering", "credits": 3, "prerequisite": "CS112", "type": "Department", "requirement": "Required"}
+        ],
+        "3": [
+          {"course_code": "MATH201", "title": "Differential Equations", "credits": 3, "prerequisite": "MATH102", "type": "Department", "requirement": "Required"},
+          {"course_code": "CS221", "title": "Operating Systems", "credits": 4, "prerequisite": "CS112", "type": "College", "requirement": "Required"},
+          {"course_code": "CS201", "title": "Introduction to Discrete Systems", "credits": 3, "prerequisite": "CS112", "type": "College", "requirement": "Required"},
+          {"course_code": "CS211", "title": "Data Structures and Algorithms", "credits": 4, "prerequisite": "CS112", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI381", "title": "Artificial Intelligence I", "credits": 3, "prerequisite": "CS112", "type": "Department", "requirement": "Required"}
+        ],
+        "4": [
+          {"course_code": "STAT232", "title": "Probability and Statistics", "credits": 3, "prerequisite": "MATH102", "type": "Department", "requirement": "Required"},
+          {"course_code": "MATH204", "title": "Linear Algebra", "credits": 3, "prerequisite": "MATH102", "type": "Department", "requirement": "Required"},
+          {"course_code": "ENGL201", "title": "Technical Writing", "credits": 3, "prerequisite": "ENGL102", "type": "Institution", "requirement": "Required"},
+          {"course_code": "CS232", "title": "Computer Networks", "credits": 4, "prerequisite": "CS112", "type": "College", "requirement": "Required"},
+          {"course_code": "AI382", "title": "Artificial Intelligence II", "credits": 3, "prerequisite": "AI381", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI372", "title": "Ethics and Professionalism", "credits": 2, "prerequisite": "-", "type": "Department", "requirement": "Required"}
+        ],
+        "5": [
+          {"course_code": "MATH303", "title": "Numerical Methods", "credits": 3, "prerequisite": "MATH201", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI305", "title": "Introduction to Machine Learning", "credits": 4, "prerequisite": "MATH204", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI361", "title": "Image Processing", "credits": 4, "prerequisite": "MATH204", "type": "Department", "requirement": "Required"},
+          {"course_code": "CS351", "title": "Fundamentals of Database Systems", "credits": 4, "prerequisite": "CS112", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI418", "title": "Human Computer Interaction", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"}
+        ],
+        "6": [
+          {"course_code": "AI385", "title": "Introduction to Computer Vision", "credits": 4, "prerequisite": "AI361", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI407", "title": "Introduction to Robotics", "credits": 4, "prerequisite": "AI305", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI417", "title": "Introduction to Deep Learning", "credits": 4, "prerequisite": "AI305", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI312", "title": "Natural Language Processing", "credits": 3, "prerequisite": "AI382", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI306", "title": "Data Mining", "credits": 3, "prerequisite": "AI305", "type": "Department", "requirement": "Required"},
+          {"course_code": "AI394", "title": "Summer Practical Training / Internship", "credits": 1, "prerequisite": "Year 3 Core Courses", "type": "Department", "requirement": "Required"}
+        ],
+        "7": [
+          {"course_code": "AI491", "title": "Capstone Project I", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+          {"course_code": "FC313", "title": "Cyber Security", "credits": 3, "prerequisite": "CS232", "type": "College", "requirement": "Required"},
+          {"course_code": "GHALxxx", "title": "Humanities, Arts, and Languages Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"},
+          {"course_code": "AI438", "title": "Selected Topics in Data Science", "credits": 2, "prerequisite": "AI306", "type": "Department", "requirement": "Elective"},
+          {"course_code": "GSOSxxx", "title": "Social Sciences Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+        ],
+        "8": [
+          {"course_code": "AI492", "title": "Capstone Project II", "credits": 3, "prerequisite": "AI491", "type": "Department", "requirement": "Required"},
+          {"course_code": "AIxxx", "title": "Professional Elective I", "credits": 3, "prerequisite": "College Approval", "type": "Department", "requirement": "Elective"},
+          {"course_code": "AIxxx", "title": "Professional Elective II", "credits": 3, "prerequisite": "College Approval", "type": "Department", "requirement": "Elective"},
+          {"course_code": "C3Sxxx", "title": "College Elective", "credits": 3, "prerequisite": "College Approval", "type": "College", "requirement": "Elective"},
+          {"course_code": "AI493", "title": "Co-op Training (replaces Level 8 electives)", "credits": 9, "prerequisite": "College Approval", "type": "Department", "requirement": "Elective"}
+        ]
+      }, 
+
+      "slot_rules": {
+        "AIXXX": {
+          "title": "AI / Professional Elective",
+          "prefixes": ["AI", "CS", "SE"],
+          "specific": ["AI495", "AI496", "CS485"]
+        },
+        "C3SXXX": {
+          "title": "College Elective",
+          "prefixes": ["CS"],
+          "specific": ["CS314"]
+        },
+        "GHALXXX": {
+          "title": "University Requirement",
+          "prefixes": ["GHAL", "GIAS"],
+          "specific": ["GIAS221"]
+        },
+        "GSOSXXX": {
+          "title": "General Studies",
+          "prefixes": ["GSOS"],
+          "specific": ["GSOS214"]
+        }
+      }
+
+    }
+  }
+}

@@ -1,0 +1,10 @@
+Flask
+pdfplumber
+pandas
+openpyxl
+pytesseract
+pdf2image
+Pillow
+requests
+sentence-transformers
+gunicorn

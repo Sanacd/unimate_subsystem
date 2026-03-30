@@ -1,0 +1,78 @@
+{
+  "gpa_rules": {
+    "excellent": { "min": 3.75, "max": 4.00 },
+    "very_good": { "min": 3.25, "max": 3.74 },
+    "good": { "min": 2.75, "max": 3.24 },
+    "pass": { "min": 2.00, "max": 2.74 },
+    "fail": { "max": 1.99 }
+  },
+
+  "academic_standing": {
+    "good_standing": "GPA >= 2.00",
+    "warning": "Issued automatically when GPA < 2.00",
+    "probation_levels": {
+      "first_probation": "Applied when GPA < 2.00 for the first semester",
+      "second_probation": "Applied when GPA < 2.00 for the second consecutive semester",
+      "third_probation": "Applied when GPA < 2.00 for the third consecutive semester"
+    },
+    "dismissal": "A student is dismissed after receiving three consecutive academic warnings"
+  },
+
+  "graduation_requirements": {
+    "minimum_gpa": 2.00,
+    "must_pass_all_required_courses": true,
+    "no_unresolved_incompletes": true,
+    "minimum_completion_percentage_at_upm": 60,
+    "final_project_required": true,
+    "coop_or_internship_required": true,
+    "minimum_credits": 125,
+    "max_study_duration_policy": "Students failing to graduate within 1.5× the standard program duration may be dismissed unless granted an extension"
+  },
+
+  "honors": {
+    "first_class": {
+      "min": 3.75,
+      "max": 4.00,
+      "conditions": [
+        "No failed courses at the university or elsewhere",
+        "Graduated within standard program duration",
+        "Completed at least 60% of credits at UPM"
+      ]
+    },
+    "second_class": {
+      "min": 3.25,
+      "max": 3.74,
+      "conditions": [
+        "No failed courses",
+        "Graduated within standard program duration",
+        "Completed 60% of credits at UPM"
+      ]
+    }
+  },
+
+  "dismissal_policy": {
+    "dropout": "Student dismissed if they stop studying without authorized postponement",
+    "disciplinary_dismissal": "May not re-enroll for 3 years after dismissal",
+    "max_absence": "Dismissal if student exceeds allowed postponement (2 consecutive or 3 non-consecutive semesters)"
+  },
+
+  "withdrawal_policy": {
+    "without_grade": "Allowed before the beginning of the third week of the semester",
+    "with_excuse_grade_W": "Allowed from week 3 to week 12",
+    "full_withdrawal": "Subject to Article Sixteen regulations",
+    "co_requisite_rule": "Department approval required for withdrawal from co-requisite courses"
+  },
+
+  "re_enrollment": {
+    "time_limit_semesters": 4,
+    "policy": "Re-enrollment must occur within 4 semesters after dismissal; otherwise, treated as new admission"
+  },
+
+  "honor_list": {
+    "criteria": {
+      "semester_gpa_first_class": { "min": 3.75, "max": 4.00, "min_hours": 15 },
+      "semester_gpa_second_class": { "min": 3.50, "max": 3.74, "min_hours": 15 }
+    },
+    "policy": "Students with excellent GPAs in both semesters of an academic year are listed on the undergraduate excellence list"
+  }
+}

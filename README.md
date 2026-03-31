@@ -3,7 +3,8 @@
 This bundle keeps the original `flask/` folder unchanged and adds deployment-only wrapper files.
 
 ## Files added
-- `deploy_adapter.py` — wraps the original Flask app and exposes deploy-friendly API routes
+- `deploy_lite.py` — lightweight deployment entrypoint that preserves transcript/chat flow without loading embeddings
+- `deploy_adapter.py` — compatibility wrapper that points to the lightweight deploy app
 - `wsgi.py` — WSGI entrypoint for hosting providers
 - `Procfile` — Gunicorn startup command
 - `requirements_deploy.txt` — deployment dependencies
@@ -26,10 +27,18 @@ This bundle keeps the original `flask/` folder unchanged and adds deployment-onl
 ## Local run
 ```bash
 pip install -r requirements_deploy.txt
-python deploy_adapter.py
+python deploy_lite.py
 ```
 
 ## Important notes
 - The original app still expects a local Ollama endpoint for answer generation (`http://localhost:11434/api/generate`).
 - If your host does not provide Ollama, transcript upload can still work, but chat replies that depend on the LLM may fail or return the app's fallback message.
 - If OCR is needed in your PDFs, some hosts also require system packages such as Tesseract and Poppler.
+
+## Lightweight deployment path
+- Deployment no longer imports `flask/app.py`, so startup does not load `SentenceTransformer` or any embedding model.
+- The unused embedding endpoints were removed from the deploy path only; the original source inside `flask/` is preserved.
+- Supported deploy endpoints remain:
+  - `POST /api/upload-transcript`
+  - `POST /api/chat`
+  - `GET /health`

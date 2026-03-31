@@ -1,1 +1,1 @@
-from deploy_adapter import app
+from deploy_lite import app

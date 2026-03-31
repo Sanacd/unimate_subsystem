@@ -7,7 +7,6 @@ import uuid
 from typing import Any
 
 import pandas as pd
-import requests
 from flask import Flask, after_this_request, jsonify, request, send_file, send_from_directory
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -89,34 +88,6 @@ def _pick_program(programs: dict, major_name: str, df_transcript) -> tuple[str, 
     return default_key, programs[default_key]
 
 
-def generate_llm_response(prompt: str) -> str:
-    payload = {
-        "model": "llama3:8b",
-        "prompt": prompt,
-        "stream": False,
-    }
-
-    try:
-        res = requests.post("http://localhost:11434/api/generate", json=payload, timeout=60)
-        if res.status_code != 200:
-            return "Advisor system is busy. Please try again in a moment."
-        try:
-            data = res.json()
-        except ValueError:
-            return "Response error from advisor engine. Please retry."
-
-        reply = data.get("response", "").strip()
-        if not reply:
-            return "Advisor could not generate a response at the moment."
-        return reply
-    except requests.exceptions.ConnectionError:
-        return "AI advisor is offline.\nPlease start Ollama and try again."
-    except requests.exceptions.Timeout:
-        return "The advisor is taking longer than expected. Please try again."
-    except Exception:
-        return "Unexpected issue. Please try again."
-
-
 def get_alert_message(facts: dict[str, Any]) -> str | None:
     try:
         gpa = float(facts.get("gpa_ug", 0) or 0)
@@ -150,6 +121,7 @@ app_shim._levels_to_year_sem = _levels_to_year_sem
 sys.modules["app"] = app_shim
 
 from agents_runtime import StudentState, load_student_state, save_student_state, ui_agent_handle_upload
+from shared_tools import build_chat_fallback, generate_llm_response
 
 with open(os.path.join(LEGACY_DIR, "academic_policy.json"), "r", encoding="utf-8") as f:
     ACADEMIC_POLICY = json.load(f)
@@ -367,7 +339,7 @@ Rules:
 Answer:
 """
 
-    reply = generate_llm_response(prompt).strip()
+    reply = generate_llm_response(prompt, fallback_text=build_chat_fallback(facts, message)).strip()
     if "gpa" in message.lower():
         alert_msg = get_alert_message(facts)
         if alert_msg:

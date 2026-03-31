@@ -23,6 +23,7 @@ import pandas as pd  # (fixed typo: panadas -> pandas)
 
 # ---- Local tools (must exist in backend) ----
 from shared_tools import (
+    build_upload_summary_fallback,
     compare_transcript_with_plan,
     generate_structured_study_plan_excel,
     generate_llm_response,
@@ -516,7 +517,8 @@ def ui_agent_handle_upload(pdf_path: str, user_id: str, reasoning_mode: str = "r
 
     # 3) Build short UI note
     summary_note = generate_llm_response(
-        f"Summarize in 5 concise bullet points the student's status using this JSON:\n{json.dumps(plan.summary)[:2500]}"
+        f"Summarize in 5 concise bullet points the student's status using this JSON:\n{json.dumps(plan.summary)[:2500]}",
+        fallback_text=build_upload_summary_fallback(plan.summary),
     )
     log_event(session_id, "UI", "thought_summary", {"ui_summary": summary_note})
 

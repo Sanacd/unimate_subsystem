@@ -3,101 +3,679 @@
 <head>
 <meta charset="UTF-8">
 <title>UniMate Academic Advisor</title>
+
 <style>
+
+/* BASIC RESET */
+
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial;height:100vh;display:flex;background:#eef2f7;overflow:hidden}
-.sidebar{width:280px;background:#1e3555;color:white;display:flex;flex-direction:column;padding:20px;gap:18px;transition:.3s}
-.sidebar.closed{width:0;padding:0;overflow:hidden}
-.main{flex:1;width:100%;display:flex;flex-direction:column;transition:.3s}
-.sidebar-top{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:bold}
-.sidebar-top img{width:40px}
-.new-chat{border:none;background:#d4af57;padding:12px;border-radius:10px;cursor:pointer;font-weight:bold}
-.section-title{font-size:13px;opacity:.7;margin-top:10px}
-.history{display:flex;flex-direction:column;gap:10px}
-.history-item{background:#29456c;padding:12px;border-radius:10px;cursor:pointer}
-.history-item .time{font-size:12px;opacity:.7;display:block;margin-top:4px}
-.sidebar-user{margin-top:auto;background:#29456c;padding:14px;border-radius:12px;display:flex;gap:12px;align-items:center}
-.avatar{width:45px;height:45px;border-radius:50%;background:#5a6f94;display:flex;align-items:center;justify-content:center;font-weight:bold}
-.meta .sub{font-size:13px;opacity:.7}
-.header{height:90px;background:white;display:flex;align-items:center;gap:16px;padding:0 25px;border-bottom:1px solid #ddd}
-.menu-icon{font-size:26px;cursor:pointer}
-.header-badge img{height:65px;object-fit:contain}
-.messages{flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:18px}
-.bot-row{display:flex;gap:10px}
-.bot-avatar{width:40px;height:40px;display:flex;align-items:center;justify-content:center}
-.bot-avatar img{width:40px}
-.bot-bubble{background:white;padding:14px 18px;border-radius:16px;max-width:520px;white-space:pre-wrap;line-height:1.45}
-.user{align-self:flex-end;background:#2b4778;color:white;padding:14px 18px;border-radius:16px;max-width:520px;white-space:pre-wrap;line-height:1.45}
-.input-wrap{background:white;padding:15px 25px;border-top:1px solid #ddd}
-.input-area{display:flex;gap:10px;align-items:center}
-input{flex:1;height:55px;border-radius:14px;border:1px solid #ddd;padding:0 15px;font-size:16px}
-.upload-btn,.send-btn{width:55px;height:55px;border:none;border-radius:14px;font-size:20px;cursor:pointer}
-.upload-btn{background:#233f73;color:white}
-.send-btn{background:#d4af57}
-.status-text{font-size:12px;color:#5b6780;margin-top:8px;padding-left:4px}
+
+body{
+margin:0;
+font-family:Arial;
+height:100vh;
+display:flex;
+background:#eef2f7;
+overflow:hidden;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:280px;
+background:#1e3555;
+color:white;
+display:flex;
+flex-direction:column;
+padding:20px;
+gap:18px;
+transition:.3s;
+}
+
+.sidebar.closed{
+width:0;
+padding:0;
+overflow:hidden;
+}
+
+/* MAIN */
+
+.main{
+flex:1;
+width:100%;
+display:flex;
+flex-direction:column;
+transition:0.3s;
+}
+
+.sidebar-top{
+display:flex;
+align-items:center;
+gap:12px;
+font-size:20px;
+font-weight:bold;
+}
+
+.sidebar-top img{
+width:40px;
+}
+
+.new-chat{
+border:none;
+background:#d4af57;
+padding:12px;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.section-title{
+font-size:13px;
+opacity:.7;
+margin-top:10px;
+}
+
+.history{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.history-item{
+background:#29456c;
+padding:12px;
+border-radius:10px;
+cursor:pointer;
+}
+
+.history-item .time{
+font-size:12px;
+opacity:.7;
+display:block;
+margin-top:4px;
+}
+
+/* USER CARD */
+
+.sidebar-user{
+margin-top:auto;
+background:#29456c;
+padding:14px;
+border-radius:12px;
+display:flex;
+gap:12px;
+align-items:center;
+}
+
+.avatar{
+width:45px;
+height:45px;
+border-radius:50%;
+background:#5a6f94;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+}
+
+.meta .sub{
+font-size:13px;
+opacity:.7;
+}
+
+/* HEADER */
+
+.header{
+height:90px;
+background:white;
+display:flex;
+align-items:center;
+gap:16px;
+padding:0 25px;
+border-bottom:1px solid #ddd;
+}
+
+.menu-icon{
+font-size:26px;
+cursor:pointer;
+}
+
+.header-badge img{
+height:65px;
+object-fit:contain;
+}
+
+/* CHAT */
+
+.messages{
+flex:1;
+overflow-y:auto;
+padding:25px;
+display:flex;
+flex-direction:column;
+gap:18px;
+}
+
+.bot-row{
+display:flex;
+gap:10px;
+}
+
+.bot-avatar{
+width:40px;
+height:40px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.bot-avatar img{
+width:40px;
+}
+
+.bot-bubble{
+background:white;
+padding:14px 18px;
+border-radius:16px;
+max-width:420px;
+white-space:pre-wrap;
+word-break:break-word;
+}
+
+.user{
+align-self:flex-end;
+background:#2b4778;
+color:white;
+padding:14px 18px;
+border-radius:16px;
+}
+
+.input-wrap{
+background:white;
+padding:15px 25px;
+border-top:1px solid #ddd;
+}
+
+.input-area{
+display:flex;
+gap:10px;
+}
+
+input{
+flex:1;
+height:55px;
+border-radius:14px;
+border:1px solid #ddd;
+padding:0 15px;
+font-size:16px;
+}
+
+/* BUTTONS */
+
+.sound-btn,.send-btn{
+width:55px;
+border:none;
+border-radius:14px;
+font-size:20px;
+cursor:pointer;
+}
+
+.sound-btn{
+background:#233f73;
+color:white;
+}
+
+.send-btn{
+background:#d4af57;
+}
+
 </style>
 </head>
 <body>
+
+<!-- SIDEBAR -->
+
 <aside class="sidebar">
-<div class="sidebar-top"><img src="logo.png"><span>UPM</span></div>
+
+<div class="sidebar-top">
+<img src="logo.png">
+<span>UPM</span>
+</div>
+
 <button class="new-chat" onclick="newChat()">+ New Consultation</button>
+
 <div class="section-title">History</div>
 <div class="history" id="history"></div>
+
 <div class="sidebar-user">
+
 <div class="avatar" id="avatarInitial">JD</div>
+
 <div class="meta">
 <div id="studentName">John Doe</div>
 <div class="sub" id="studentID">Student ID: 09214</div>
 </div>
+
 </div>
+
 </aside>
+
+<!-- MAIN AREA -->
+
 <main class="main">
+
 <div class="header">
+
 <div class="menu-icon" onclick="toggleSidebar()">☰</div>
-<div class="header-badge"><img src="./UPM11.png"></div>
-<div><b>UniMate Academic Advisor</b><br>UPM University</div>
+
+<div class="header-badge">
+<img src="./UPM11.png">
 </div>
+
+<div>
+<b>UniMate Academic Advisor</b><br>
+UPM University
+</div>
+
+</div>
+
 <div class="messages" id="messages"></div>
+
 <div class="input-wrap">
+
 <div class="input-area">
+
 <input type="file" id="transcriptFile" accept=".pdf" hidden>
-<button class="upload-btn" id="uploadBtn" onclick="triggerTranscriptUpload()" title="Upload transcript">📎</button>
+
+<button class="sound-btn" id="uploadBtn" type="button" onclick="document.getElementById('transcriptFile').click()">📎</button>
+
 <input id="input" placeholder="Ask your academic advisor...">
+
 <button class="send-btn" id="sendBtn" onclick="send()">➤</button>
+
 </div>
-<div class="status-text" id="statusText">No transcript uploaded yet.</div>
+
 </div>
+
 </main>
+
 <script>
-const BACKEND_URL = "https://YOUR-BACKEND-DOMAIN";
-const messages=document.getElementById("messages");
-const input=document.getElementById("input");
-const sendBtn=document.getElementById("sendBtn");
-const uploadBtn=document.getElementById("uploadBtn");
-const transcriptFile=document.getElementById("transcriptFile");
-const statusText=document.getElementById("statusText");
+
+/* DOM ELEMENTS */
+
+const messages=document.getElementById("messages")
+const input=document.getElementById("input")
+const sendBtn=document.getElementById("sendBtn")
+const transcriptFile=document.getElementById("transcriptFile")
+
+/* URLS */
+
+const N8N_CHAT_URL="https://ghaidaa2001.app.n8n.cloud/webhook/9709f789-eb90-43f8-915d-99220c961b0c/chat"
+const SUBSYSTEM_URL="https://sanamouazen.pythonanywhere.com"
+
+  // create or load session id
 let sessionId = localStorage.getItem("chat_session_id");
-let advisorSessionId = localStorage.getItem("advisor_session_id") || "";
-let chatHistory = [];
-let currentUserId = "";
-let chats = JSON.parse(localStorage.getItem("chats")) || [];
-let currentChatId = "";
-if(!sessionId){sessionId = "session-" + Math.random().toString(36).substring(2,10);localStorage.setItem("chat_session_id", sessionId)}
-let sending=false;
-function toggleSidebar(){document.querySelector(".sidebar").classList.toggle("closed")}
-function addHistory(){const history=document.getElementById("history");history.innerHTML="";const allChats = JSON.parse(localStorage.getItem("chats")) || [];allChats.slice().reverse().forEach(chat => {const item=document.createElement("div");item.className="history-item";const lastMsg = chat.messages?.[chat.messages.length - 1];item.innerHTML=(lastMsg?.text || "New Chat").slice(0,40)+"<span class='time'>"+formatTime()+"</span>";item.onclick = () => loadChat(chat.id);history.appendChild(item)})}
-function loadChat(chatId){const allChats = JSON.parse(localStorage.getItem("chats")) || [];const chat = allChats.find(c => c.id === chatId);currentChatId = chatId;messages.innerHTML="";if(!chat || !chat.messages) return;chat.messages.forEach(msg => {if(msg.type==="user"){addUserMessage(msg.text,false)} else {addBotMessage(msg.text,false)}})}
-function formatTime(){const now=new Date();return now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
-function addBotMessage(text, save = true){const row=document.createElement("div");row.className="bot-row";const avatar=document.createElement("div");avatar.className="bot-avatar";const img=document.createElement("img");img.src="logo.png";avatar.appendChild(img);const bubble=document.createElement("div");bubble.className="bot-bubble";bubble.textContent=text;row.appendChild(avatar);row.appendChild(bubble);messages.appendChild(row);messages.scrollTop=messages.scrollHeight;if(save){chatHistory.push({type:"bot", text:text});const chat = chats.find(c => c.id === currentChatId);if(!chat) return;chat.messages.push({type:"bot", text:text});localStorage.setItem("chats", JSON.stringify(chats))}}
-function addUserMessage(text, save = true){const bubble=document.createElement("div");bubble.className="user";bubble.textContent=text;messages.appendChild(bubble);messages.scrollTop=messages.scrollHeight;if(save){chatHistory.push({type:"user", text:text});const chat = chats.find(c => c.id === currentChatId);if(!chat) return;chat.messages.push({type:"user", text:text});localStorage.setItem("chats", JSON.stringify(chats))}}
-function newChat(){messages.innerHTML="";chatHistory = [];currentChatId = "chat_" + Date.now();chats.push({id: currentChatId,messages: []});localStorage.setItem("chats", JSON.stringify(chats));const welcome="Hello! I'm your UniMate Academic Advisor. How can I help you today?";addBotMessage(welcome);addHistory()}
-function triggerTranscriptUpload(){transcriptFile.click()}
-transcriptFile.addEventListener("change", async () => {const file = transcriptFile.files[0];if(!file) return;await uploadTranscript(file);transcriptFile.value = "";});
-async function uploadTranscript(file){uploadBtn.disabled = true;uploadBtn.textContent = "...";statusText.textContent = "Uploading transcript...";const formData = new FormData();formData.append("file", file);try{const res = await fetch(`${BACKEND_URL}/api/upload-transcript`, {method:"POST",body: formData,credentials:"include"});const data = await res.json();if(!res.ok){throw new Error(data.error || data.response || "Upload failed")};advisorSessionId = data.session_id || "";localStorage.setItem("advisor_session_id", advisorSessionId);statusText.textContent = `Transcript uploaded. Major: ${data.major || 'Detected'} | GPA: ${data.gpa ?? 'N/A'}`;addBotMessage(data.ui_summary || data.alert || data.response || "Transcript uploaded successfully.")}catch(err){console.error(err);statusText.textContent = "Transcript upload failed.";addBotMessage("Transcript upload failed: " + err.message)}finally{uploadBtn.disabled = false;uploadBtn.textContent = "📎"}}
-async function send(){if(sending) return;const text = input.value.trim();if(!text) return;sending = true;sendBtn.textContent = "...";addUserMessage(text);addHistory(text);input.value = "";try{const res = await fetch(`${BACKEND_URL}/api/chat`, {method:"POST",headers:{"Content-Type":"application/json"},credentials:"include",body: JSON.stringify({message: text,session_id: advisorSessionId})});const data = await res.json();const reply = data.response || "Sorry, I couldn't get a response.";if(data.session_id){advisorSessionId = data.session_id;localStorage.setItem("advisor_session_id", advisorSessionId)}addBotMessage(reply)}catch(err){console.error(err);addBotMessage("Connection error with the backend service.")}sendBtn.textContent="➤";sending=false}
-input.addEventListener("keydown",(e)=>{if(e.key==="Enter") send()})
-function askStudent(){let name = localStorage.getItem("studentName");let id = localStorage.getItem("studentID");if(!name){name = prompt("Enter your name");id = prompt("Enter your student ID");localStorage.setItem("studentName", name);localStorage.setItem("studentID", id)}document.getElementById("studentName").textContent = name;document.getElementById("studentID").textContent = "Student ID: " + id;document.getElementById("avatarInitial").textContent = name[0];currentUserId = id;currentChatId = "chat_" + Date.now();chatHistory = [];chats.push({id: currentChatId,messages: []});localStorage.setItem("chats", JSON.stringify(chats));messages.innerHTML = "";chatHistory.forEach(msg => {if(msg.type === "user"){addUserMessage(msg.text, false)} else {addBotMessage(msg.text, false)}});if(advisorSessionId){statusText.textContent = "Transcript session restored."}}
-window.addEventListener("load",()=>{askStudent();addHistory();if(chatHistory.length === 0){const welcome="Hello! I'm your UniMate Academic Advisor. Upload your transcript, then ask me anything about your study progress.";addBotMessage(welcome)}})
+
+  // ===== Chat History Variables =====
+let chatHistory = []
+let currentUserId = ""
+let chats = JSON.parse(localStorage.getItem("chats")) || []
+let currentChatId = ""
+
+/* SUBSYSTEM DATA */
+
+let transcriptReady = localStorage.getItem("transcriptReady") === "true"
+let subsystemData = JSON.parse(localStorage.getItem("subsystemData") || "null")
+
+if(!sessionId){
+  sessionId = "session-" + Math.random().toString(36).substring(2,10);
+  localStorage.setItem("chat_session_id", sessionId);
+}
+
+/* MESSAGE LOCK */
+
+let sending=false
+
+/* SIDEBAR TOGGLE */
+
+function toggleSidebar(){
+document.querySelector(".sidebar").classList.toggle("closed")
+}
+
+/* CHAT HISTORY */
+
+function addHistory(){
+
+const history=document.getElementById("history")
+history.innerHTML=""
+
+const allChats = JSON.parse(localStorage.getItem("chats")) || []
+
+allChats.slice().reverse().forEach(chat => {
+
+  const item=document.createElement("div")
+  item.className="history-item"
+
+  const lastMsg = chat.messages?.[chat.messages.length - 1]
+
+  item.innerHTML=(lastMsg?.text || "New Chat").slice(0,40) +
+  "<span class='time'>"+formatTime()+"</span>"
+
+  item.onclick = () => loadChat(chat.id)
+
+  history.appendChild(item)
+
+})
+
+}
+
+/* Load chat from history and display messages */
+
+function loadChat(chatId){
+
+const allChats = JSON.parse(localStorage.getItem("chats")) || []
+
+const chat = allChats.find(c => c.id === chatId)
+
+currentChatId = chatId
+
+messages.innerHTML=""
+
+if(!chat || !chat.messages) return
+chat.messages.forEach(msg => {
+  if(msg.type==="user"){
+    addUserMessage(msg.text,false)
+  } else {
+    addBotMessage(msg.text,false)
+  }
+})
+
+} 
+
+/* TIME FORMAT */
+
+function formatTime(){
+const now=new Date()
+return now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
+}
+
+/* BOT MESSAGE */
+
+function addBotMessage(text, save = true){
+
+const row=document.createElement("div")
+row.className="bot-row"
+
+const avatar=document.createElement("div")
+avatar.className="bot-avatar"
+
+const img=document.createElement("img")
+img.src="logo.png"
+
+avatar.appendChild(img)
+
+const bubble=document.createElement("div")
+bubble.className="bot-bubble"
+bubble.textContent=text
+
+row.appendChild(avatar)
+row.appendChild(bubble)
+
+messages.appendChild(row)
+messages.scrollTop=messages.scrollHeight
+
+if(save){
+  chatHistory.push({type:"bot", text:text})
+  const chat = chats.find(c => c.id === currentChatId)
+  if(!chat) return
+  chat.messages.push({type:"bot", text:text})
+
+  localStorage.setItem("chats", JSON.stringify(chats))
+}
+
+}
+
+/* USER MESSAGE */
+
+function addUserMessage(text, save = true){
+
+const bubble=document.createElement("div")
+bubble.className="user"
+bubble.textContent=text
+
+messages.appendChild(bubble)
+messages.scrollTop=messages.scrollHeight
+
+if(save){
+
+  chatHistory.push({type:"user", text:text})
+
+  const chat = chats.find(c => c.id === currentChatId)
+
+  if(!chat) return
+
+  chat.messages.push({type:"user", text:text})
+
+  localStorage.setItem("chats", JSON.stringify(chats))
+}
+
+}
+
+/* NEW CHAT */
+
+function newChat(){
+
+messages.innerHTML=""
+
+chatHistory = []
+
+currentChatId = "chat_" + Date.now()
+
+chats.push({
+  id: currentChatId,
+  messages: []
+})
+
+localStorage.setItem("chats", JSON.stringify(chats))
+
+const welcome="Hello! I'm your UniMate Academic Advisor. How can I help you today?"
+addBotMessage(welcome)
+
+addHistory()
+
+}
+
+/* SUBSYSTEM UPLOAD */
+
+transcriptFile.addEventListener("change", async (e) => {
+
+const file = e.target.files[0]
+if(!file) return
+
+addUserMessage("Uploading transcript...")
+
+const formData = new FormData()
+formData.append("file", file)
+formData.append("sessionId", sessionId)
+formData.append("studentId", localStorage.getItem("studentID") || "")
+formData.append("studentName", localStorage.getItem("studentName") || "")
+
+try{
+
+const res = await fetch(`${SUBSYSTEM_URL}/api/upload-transcript`, {
+method:"POST",
+body: formData
+})
+
+const data = await res.json()
+console.log("Subsystem response:", data)
+
+if(res.ok){
+  transcriptReady = true
+  subsystemData = data
+
+  localStorage.setItem("transcriptReady", "true")
+  localStorage.setItem("subsystemData", JSON.stringify(data))
+
+  const statusMsg =
+    data.message ||
+    data.output ||
+    data.reply ||
+    "Transcript uploaded successfully."
+
+  addBotMessage(statusMsg)
+
+  const studyPlan =
+    data.study_plan ||
+    data.studyPlan ||
+    data.plan ||
+    data.generated_plan ||
+    data.plan_text ||
+    data.study_plan_text ||
+    data.output_plan
+
+  if (studyPlan) {
+    if (typeof studyPlan === "string") {
+      addBotMessage(studyPlan)
+    } else {
+      addBotMessage(JSON.stringify(studyPlan, null, 2))
+    }
+  }
+}else{
+  addBotMessage(data.error || "Transcript upload failed.")
+}
+
+}catch(err){
+
+console.error(err)
+addBotMessage("Connection error with the transcript subsystem.")
+
+}
+
+e.target.value = ""
+
+})
+
+/* SEND MESSAGE TO n8n */
+
+async function send(){
+
+if(sending) return
+
+const text = input.value.trim()
+if(!text) return
+
+sending = true
+sendBtn.textContent = "..."
+
+addUserMessage(text)
+addHistory(text)
+
+input.value = ""
+
+try{
+
+const res = await fetch(
+N8N_CHAT_URL,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body: JSON.stringify({
+chatInput: text,
+sessionId: sessionId,
+transcriptReady: transcriptReady,
+subsystemData: subsystemData
+})
+})
+
+const data = await res.json()
+
+const reply = data.output || "Sorry, I couldn't get a response."
+addBotMessage(reply)
+
+}catch(err){
+
+console.error(err)
+addBotMessage("Connection error with the AI service.")
+
+}
+
+sendBtn.textContent="➤"
+sending=false
+
+}
+
+/* ENTER TO SEND */
+
+input.addEventListener("keydown",(e)=>{
+if(e.key==="Enter") send()
+})
+
+/* STUDENT LOGIN */
+
+function askStudent(){
+
+let name = localStorage.getItem("studentName")
+let id = localStorage.getItem("studentID")
+
+if(!name){
+
+  name = prompt("Enter your name")
+  id = prompt("Enter your student ID")
+
+  localStorage.setItem("studentName", name)
+  localStorage.setItem("studentID", id)
+}
+
+document.getElementById("studentName").textContent = name
+document.getElementById("studentID").textContent = "Student ID: " + id
+
+document.getElementById("avatarInitial").textContent = name ? name[0] : "U"
+
+currentUserId = id
+
+// create new chat every time page loads
+currentChatId = "chat_" + Date.now()
+
+chatHistory = []
+
+chats.push({
+  id: currentChatId,
+  messages: []
+})
+
+localStorage.setItem("chats", JSON.stringify(chats))
+
+messages.innerHTML = ""
+
+chatHistory.forEach(msg => {
+  if(msg.type === "user"){
+    addUserMessage(msg.text, false)
+  } else {
+    addBotMessage(msg.text, false)
+  }
+})
+
+}
+
+/* PAGE LOAD */
+
+window.addEventListener("load",()=>{
+
+askStudent()
+addHistory()
+
+// ===== Show welcome ONLY if no history =====
+if(chatHistory.length === 0){
+  const welcome="Hello! I'm your UniMate Academic Advisor. How can I help you today?"
+  addBotMessage(welcome)
+}
+
+})
+
 </script>
+
 </body>
 </html>

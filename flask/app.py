@@ -807,49 +807,11 @@ def _pick_program(programs: dict, major_name: str, df_transcript) -> tuple[str, 
 
 # ----------------------------------------------------------
 # LLM Generator
-# ----------------------------------------------------------
 def generate_llm_response(prompt: str) -> str:
-    """
-    Safe wrapper to call local Ollama LLM.
-    Falls back gracefully if offline.
-    """
-    OLLAMA_URL = "http://localhost:11434/api/generate"
-    MODEL = "llama3:8b"
+    """Gemini-backed text generation wrapper."""
+    from shared_tools import generate_llm_response as _shared_generate_llm_response
 
-    payload = {
-        "model": MODEL,
-        "prompt": prompt,
-        "stream": False
-    }
-
-    try:
-        res = requests.post(OLLAMA_URL, json=payload, timeout=60)
-
-        # Handle non-200 responses
-        if res.status_code != 200:
-            return "⚠️ Advisor system is busy. Please try again in a moment."
-
-        # Safely parse JSON
-        try:
-            data = res.json()
-        except ValueError:
-            return "⚠️ Response error from advisor engine. Please retry."
-
-        reply = data.get("response", "").strip()
-        if not reply:
-            return "⚠️ Advisor could not generate a response at the moment."
-
-        return reply
-
-    except requests.exceptions.ConnectionError:
-        return (
-            "⚠️ AI advisor is offline.\n"
-            "Please start Ollama and try again."
-        )
-    except requests.exceptions.Timeout:
-        return "⏳ The advisor is taking longer than expected. Please try again."
-    except Exception:
-        return "⚠️ Unexpected issue. Please try again."
+    return _shared_generate_llm_response(prompt)
 # ==============================================================
 # 🎓 Transcript Upload + GPA Conditional Alerts
 # ==============================================================

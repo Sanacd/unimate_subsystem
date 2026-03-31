@@ -31,8 +31,9 @@ python deploy_lite.py
 ```
 
 ## Important notes
-- The original app still expects a local Ollama endpoint for answer generation (`http://localhost:11434/api/generate`).
-- If your host does not provide Ollama, transcript upload can still work, but chat replies that depend on the LLM may fail or return the app's fallback message.
+- Natural-language generation now uses the Gemini API via `GEMINI_API_KEY`.
+- `GEMINI_MODEL` can override the default model (`gemini-2.5-flash`).
+- If Gemini is unavailable, transcript upload still succeeds, Excel generation still completes, and the app returns a structured fallback summary instead of failing.
 - If OCR is needed in your PDFs, some hosts also require system packages such as Tesseract and Poppler.
 
 ## Lightweight deployment path

@@ -416,7 +416,8 @@ avatar.appendChild(img)
 
 const bubble=document.createElement("div")
 bubble.className="bot-bubble"
-bubble.textContent=text
+const urlPattern = /(https?:\/\/[^\s]+)/g;
+bubble.innerHTML = String(text).replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 
 row.appendChild(avatar)
 row.appendChild(bubble)
@@ -441,7 +442,8 @@ function addUserMessage(text, save = true){
 
 const bubble=document.createElement("div")
 bubble.className="user"
-bubble.textContent=text
+const urlPattern = /(https?:\/\/[^\s]+)/g;
+bubble.innerHTML = String(text).replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 
 messages.appendChild(bubble)
 messages.scrollTop=messages.scrollHeight
@@ -518,6 +520,7 @@ if(res.ok){
   localStorage.setItem("subsystemData", JSON.stringify(data))
 
   const statusMsg =
+    data.ui_summary ||
     data.message ||
     data.output ||
     data.reply ||
@@ -525,21 +528,16 @@ if(res.ok){
 
   addBotMessage(statusMsg)
 
-  const studyPlan =
-    data.study_plan ||
-    data.studyPlan ||
-    data.plan ||
-    data.generated_plan ||
-    data.plan_text ||
-    data.study_plan_text ||
-    data.output_plan
+  if (data.alert) {
+    addBotMessage(data.alert)
+  }
 
-  if (studyPlan) {
-    if (typeof studyPlan === "string") {
-      addBotMessage(studyPlan)
-    } else {
-      addBotMessage(JSON.stringify(studyPlan, null, 2))
-    }
+  if (Array.isArray(data.remaining_courses) && data.remaining_courses.length) {
+    addBotMessage("Remaining courses:\n" + data.remaining_courses.join("\n"))
+  }
+
+  if (data.excel_path) {
+    addBotMessage("Download your study plan report:\n" + SUBSYSTEM_URL + data.excel_path)
   }
 }else{
   addBotMessage(data.error || "Transcript upload failed.")

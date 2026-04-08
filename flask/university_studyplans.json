@@ -5,6 +5,2694 @@
     "dataset_version": "1.0"
   },
   "programs": {
+    "BS in Architectural Engineering": {
+  "version": "AE Current Study Plan (134 credits)",
+  "total_credit_hours": 134,
+  "levels": {
+    "1": [
+      {
+        "course_code": "MATH101",
+        "title": "Calculus I",
+        "credits": 4,
+        "prerequisite": "MATH002",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "PHYS101",
+        "title": "General Physics I",
+        "credits": 4,
+        "prerequisite": "MATH002",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CHEM101",
+        "title": "General Chemistry",
+        "credits": 4,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL101",
+        "title": "First Year Composition",
+        "credits": 3,
+        "prerequisite": "ENGL005",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GHALxxx",
+        "title": "Humanities, Arts and Languages Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+    "2": [
+      {
+        "course_code": "MATH102",
+        "title": "Calculus II",
+        "credits": 4,
+        "prerequisite": "MATH101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "PHYS102",
+        "title": "General Physics II",
+        "credits": 4,
+        "prerequisite": "PHYS101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL102",
+        "title": "Introduction to Report Writing",
+        "credits": 3,
+        "prerequisite": "ENGL101",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CS141",
+        "title": "Introduction to Computing for Engineers",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGG103",
+        "title": "Introduction to Engineering Drawing",
+        "credits": 1,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GEO144",
+        "title": "Geology",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      }
+    ],
+    "3": [
+      {
+        "course_code": "MATH201",
+        "title": "Differential Equations",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE211",
+        "title": "Introduction to Architecture Design & Graphics",
+        "credits": 2,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE213",
+        "title": "History of Architecture",
+        "credits": 2,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGG203",
+        "title": "Statics and Dynamics",
+        "credits": 4,
+        "prerequisite": "PHYS101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL201",
+        "title": "Technical Writing",
+        "credits": 3,
+        "prerequisite": "ENGL102",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS101",
+        "title": "Islamic Culture",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      }
+    ],
+    "4": [
+      {
+        "course_code": "MATH202",
+        "title": "Calculus III",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE212",
+        "title": "Architectural Design I",
+        "credits": 3,
+        "prerequisite": "AE211",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE222",
+        "title": "Applications of CAD & BIM Systems",
+        "credits": 2,
+        "prerequisite": "CS141, AE211",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE232",
+        "title": "Building Construction, Materials & Technology I",
+        "credits": 2,
+        "prerequisite": "AE211",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ME201",
+        "title": "Thermodynamics",
+        "credits": 3,
+        "prerequisite": "PHYS102, MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE212",
+        "title": "Strength of Materials",
+        "credits": 3,
+        "prerequisite": "ENGG203 or CE201",
+        "type": "Department",
+        "requirement": "Required"
+      }
+    ],
+    "5": [
+      {
+        "course_code": "AE301",
+        "title": "Fluid Mechanics",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE311",
+        "title": "Architectural Design II",
+        "credits": 3,
+        "prerequisite": "AE212",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE331",
+        "title": "Building Construction, Materials & Technology II",
+        "credits": 2,
+        "prerequisite": "AE232",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE343",
+        "title": "Mechanical Systems in Buildings",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE311",
+        "title": "Structural Analysis",
+        "credits": 3,
+        "prerequisite": "CE212",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS102",
+        "title": "Arabic Language Skills",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      }
+    ],
+    "6": [
+      {
+        "course_code": "AE332",
+        "title": "Building Construction Documents",
+        "credits": 2,
+        "prerequisite": "AE331",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE342",
+        "title": "Electrical Systems & Illumination in Building",
+        "credits": 3,
+        "prerequisite": "PHYS102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE344",
+        "title": "HVAC Systems",
+        "credits": 3,
+        "prerequisite": "AE301",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE312",
+        "title": "Reinforced Concrete Design",
+        "credits": 3,
+        "prerequisite": "CE311",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "STAT342",
+        "title": "Statistical Methods for Engineers",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GSOSxxx",
+        "title": "Social Sciences Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "AE394",
+        "title": "Summer Field Experience II",
+        "credits": 1,
+        "prerequisite": "Year 3 Core Courses",
+        "type": "Department",
+        "requirement": "Required"
+      }
+    ],
+    "7": [
+      {
+        "course_code": "AE411",
+        "title": "Architectural Design III",
+        "credits": 3,
+        "prerequisite": "AE311",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE461",
+        "title": "Construction Economy",
+        "credits": 2,
+        "prerequisite": "ENGG203",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE413",
+        "title": "Steel Design",
+        "credits": 3,
+        "prerequisite": "CE311",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE491",
+        "title": "Capstone Project I",
+        "credits": 1,
+        "prerequisite": "Senior Status (>= 98 credits)",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE4xx",
+        "title": "Professional Elective I",
+        "credits": 3,
+        "prerequisite": "Depends on topic",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "GDMCxxx",
+        "title": "Diversity and Multiculturalism Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+    "8": [
+      {
+        "course_code": "AE462",
+        "title": "Projects Management",
+        "credits": 3,
+        "prerequisite": "AE461",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE492",
+        "title": "Capstone Project II",
+        "credits": 3,
+        "prerequisite": "AE491",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "AE4xx",
+        "title": "Professional Elective II",
+        "credits": 3,
+        "prerequisite": "Depends on topic",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "AE4xxx",
+        "title": "Professional Elective III",
+        "credits": 3,
+        "prerequisite": "Depends on topic",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "GIASxxx",
+        "title": "Islamic Studies Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ]
+  }
+    },
+    "BS in Civil Engineering": {
+  "version": "Ver. 2.0 – April 2017",
+  "total_credit_hours": 137,
+  "levels": {
+    "1": [
+      {
+        "course_code": "MATH101",
+        "title": "Calculus I",
+        "credits": 4,
+        "prerequisite": "MATH002",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "PHYS101",
+        "title": "General Physics I",
+        "credits": 4,
+        "prerequisite": "MATH002",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CHEM101",
+        "title": "General Chemistry",
+        "credits": 4,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL101",
+        "title": "First Year Composition",
+        "credits": 3,
+        "prerequisite": "ENGL005",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GHALxxx",
+        "title": "Humanities, Arts and Languages Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "2": [
+      {
+        "course_code": "MATH102",
+        "title": "Calculus II",
+        "credits": 4,
+        "prerequisite": "MATH101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "PHYS102",
+        "title": "General Physics II",
+        "credits": 4,
+        "prerequisite": "PHYS101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL102",
+        "title": "Introduction to Report Writing",
+        "credits": 3,
+        "prerequisite": "ENGL101",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CS141",
+        "title": "Introduction to Computing for Engineers",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGG103",
+        "title": "Introduction to Engineering Drawing",
+        "credits": 1,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GDMCxxx",
+        "title": "Diversity & Multiculturalism Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "3": [
+      {
+        "course_code": "MATH201",
+        "title": "Differential Equations",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE201",
+        "title": "Statics",
+        "credits": 3,
+        "prerequisite": "PHYS101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE203",
+        "title": "Computer Graphics",
+        "credits": 2,
+        "prerequisite": "ENGG103",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ME201",
+        "title": "Thermodynamics",
+        "credits": 3,
+        "prerequisite": "PHYS102, MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL201",
+        "title": "Technical Writing",
+        "credits": 3,
+        "prerequisite": "ENGL102",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS101",
+        "title": "Islamic Culture",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE294",
+        "title": "Summer Field Experience I (Optional)",
+        "credits": 1,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Elective"
+      }
+    ],
+
+    "4": [
+      {
+        "course_code": "MATH202",
+        "title": "Calculus III",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GEO144",
+        "title": "Geology",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE202",
+        "title": "Dynamics",
+        "credits": 3,
+        "prerequisite": "CE201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE212",
+        "title": "Strength of Materials",
+        "credits": 3,
+        "prerequisite": "ENGG203 or CE201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE262",
+        "title": "Surveying",
+        "credits": 2,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS102",
+        "title": "Arabic Language Skills",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      }
+    ],
+
+    "5": [
+      {
+        "course_code": "STAT342",
+        "title": "Statistical Methods for Engineers",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MATH303",
+        "title": "Numerical Methods",
+        "credits": 3,
+        "prerequisite": "MATH201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE301",
+        "title": "Civil Engineering Materials",
+        "credits": 3,
+        "prerequisite": "CE212",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE303",
+        "title": "Fluid Mechanics",
+        "credits": 3,
+        "prerequisite": "CE202, ME201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE311",
+        "title": "Structural Analysis",
+        "credits": 3,
+        "prerequisite": "CE212",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GSOSxxx",
+        "title": "Social Sciences Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "CE394",
+        "title": "Summer Field Experience II",
+        "credits": 1,
+        "prerequisite": "Year 3 Core Courses",
+        "type": "Department",
+        "requirement": "Required"
+      }
+    ],
+
+    "6": [
+      {
+        "course_code": "CE312",
+        "title": "Reinforced Concrete Design",
+        "credits": 3,
+        "prerequisite": "CE311",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE332",
+        "title": "Soil Mechanics",
+        "credits": 4,
+        "prerequisite": "CE212",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE342",
+        "title": "Water Resources Engineering",
+        "credits": 4,
+        "prerequisite": "CE303",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE362",
+        "title": "Transportation Engineering",
+        "credits": 3,
+        "prerequisite": "CE262",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE372",
+        "title": "Introduction to Engineering Design",
+        "credits": 1,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIASxxx",
+        "title": "Islamic Studies Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "7": [
+      {
+        "course_code": "CE411",
+        "title": "Foundation Design",
+        "credits": 3,
+        "prerequisite": "CE332",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE413",
+        "title": "Steel Design",
+        "credits": 3,
+        "prerequisite": "CE311",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE451",
+        "title": "Environmental Engineering",
+        "credits": 3,
+        "prerequisite": "CHEM101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE491",
+        "title": "Capstone Project I",
+        "credits": 1,
+        "prerequisite": "Senior Status (>=98 credits)",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE4xx",
+        "title": "Professional Elective I",
+        "credits": 3,
+        "prerequisite": "Depends on topic",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "CE4xx",
+        "title": "Professional Elective II",
+        "credits": 3,
+        "prerequisite": "Depends on topic",
+        "type": "Department",
+        "requirement": "Elective"
+      }
+    ],
+
+    "8": [
+      {
+        "course_code": "ENGG404",
+        "title": "Engineering Economy",
+        "credits": 2,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE472",
+        "title": "Construction Engineering & Management",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE492",
+        "title": "Capstone Project II",
+        "credits": 3,
+        "prerequisite": "CE491",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CE4xx",
+        "title": "Professional Elective III",
+        "credits": 3,
+        "prerequisite": "Depends on topic",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "XXXXxxx",
+        "title": "Free Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Elective"
+      }
+    ]
+  }
+    },
+
+    "BS in Electrical Engineering": {
+  "version": "Ver. 2.0 – April 2017",
+  "total_credit_hours": 136,
+  "levels": {
+    "1": [
+      {
+        "course_code": "MATH101",
+        "title": "Calculus I",
+        "credits": 4,
+        "prerequisite": "MATH002",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "PHYS101",
+        "title": "General Physics I",
+        "credits": 4,
+        "prerequisite": "MATH002",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CHEM101",
+        "title": "General Chemistry",
+        "credits": 4,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL101",
+        "title": "First Year Composition",
+        "credits": 3,
+        "prerequisite": "ENGL005",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GHALxxx",
+        "title": "Humanities, Arts and Languages Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "2": [
+      {
+        "course_code": "MATH102",
+        "title": "Calculus II",
+        "credits": 4,
+        "prerequisite": "MATH101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "PHYS102",
+        "title": "General Physics II",
+        "credits": 4,
+        "prerequisite": "PHYS101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL102",
+        "title": "Introduction to Report Writing",
+        "credits": 3,
+        "prerequisite": "ENGL101",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CS141",
+        "title": "Introduction to Computing for Engineers",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGG103",
+        "title": "Introduction to Engineering Drawing",
+        "credits": 1,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GDMCxxx",
+        "title": "Diversity and Multiculturalism Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "3": [
+      {
+        "course_code": "MATH201",
+        "title": "Differential Equations",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE201",
+        "title": "Electric Circuits I",
+        "credits": 3,
+        "prerequisite": "MATH102, PHYS102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE203",
+        "title": "Electric Circuits I Lab",
+        "credits": 1,
+        "prerequisite": "EE201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE231",
+        "title": "Logic Circuits Design",
+        "credits": 3,
+        "prerequisite": "CS141, PHYS102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE233",
+        "title": "Logic Circuits Design Lab",
+        "credits": 1,
+        "prerequisite": "EE231",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL201",
+        "title": "Technical Writing",
+        "credits": 3,
+        "prerequisite": "ENGL102",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS101",
+        "title": "Islamic Culture",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      }
+    ],
+
+    "4": [
+      {
+        "course_code": "MATH202",
+        "title": "Calculus III",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MATH204",
+        "title": "Linear Algebra",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE202",
+        "title": "Electric Circuits II",
+        "credits": 3,
+        "prerequisite": "MATH201, EE201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE222",
+        "title": "Electronic Circuits I",
+        "credits": 3,
+        "prerequisite": "EE201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE224",
+        "title": "Electronic Circuits I Lab",
+        "credits": 1,
+        "prerequisite": "EE222",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS102",
+        "title": "Arabic Language Skills",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      }
+    ],
+
+    "5": [
+      {
+        "course_code": "MATH301",
+        "title": "Advanced Mathematics for EE",
+        "credits": 3,
+        "prerequisite": "MATH202, MATH204",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "STAT342",
+        "title": "Statistical Methods for Engineers",
+        "credits": 3,
+        "prerequisite": "MATH102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE311",
+        "title": "Electromagnetic Fields",
+        "credits": 2,
+        "prerequisite": "PHYS102, MATH202",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE321",
+        "title": "Electronic Circuits II",
+        "credits": 3,
+        "prerequisite": "EE222",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE323",
+        "title": "Electronic Circuits II Lab",
+        "credits": 1,
+        "prerequisite": "EE321",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE341",
+        "title": "Signals & Systems",
+        "credits": 3,
+        "prerequisite": "EE202, MATH201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE351",
+        "title": "Electric Machines",
+        "credits": 3,
+        "prerequisite": "EE201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GSOSxxx",
+        "title": "Social Sciences Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "6": [
+      {
+        "course_code": "EE312",
+        "title": "Electromagnetic Waves",
+        "credits": 2,
+        "prerequisite": "EE311, MATH301",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE326",
+        "title": "Microprocessor & Microcontroller",
+        "credits": 3,
+        "prerequisite": "EE231, EE321",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE328",
+        "title": "Microprocessor & Microcontroller Applications Lab",
+        "credits": 1,
+        "prerequisite": "EE326",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE342",
+        "title": "Introduction to Digital Signal Processing",
+        "credits": 3,
+        "prerequisite": "EE341",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE356",
+        "title": "Introduction to Modern Power Systems",
+        "credits": 3,
+        "prerequisite": "EE201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE358",
+        "title": "Electric Machines and Power Lab",
+        "credits": 1,
+        "prerequisite": "EE351, EE356",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGG304",
+        "title": "Introduction to Engineering Economy",
+        "credits": 2,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      }
+    ],
+
+    "7": [
+      {
+        "course_code": "EE461",
+        "title": "Control Systems Analysis",
+        "credits": 3,
+        "prerequisite": "EE341, MATH301",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE463",
+        "title": "Control Systems Lab",
+        "credits": 1,
+        "prerequisite": "EE461",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE471",
+        "title": "Communication Systems",
+        "credits": 3,
+        "prerequisite": "EE341, STAT342",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE473",
+        "title": "Communication Systems Lab",
+        "credits": 1,
+        "prerequisite": "EE471",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE491",
+        "title": "Capstone Project I",
+        "credits": 1,
+        "prerequisite": "Senior Status (>= 98 credits)",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE4xx",
+        "title": "Professional Elective I",
+        "credits": 3,
+        "prerequisite": "Depends on topic",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "XXXXxxx",
+        "title": "Free Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Elective"
+      }
+    ],
+
+    "8": [
+      {
+        "course_code": "ENGG401",
+        "title": "Engineering Management",
+        "credits": 3,
+        "prerequisite": "ENGG304",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE492",
+        "title": "Capstone Project II",
+        "credits": 3,
+        "prerequisite": "EE491",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "EE4xx",
+        "title": "Professional Elective II",
+        "credits": 3,
+        "prerequisite": "Depends on topic",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "EE4xx",
+        "title": "Professional Elective III",
+        "credits": 3,
+        "prerequisite": "Depends on topic",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "GIASxxx",
+        "title": "Islamic Studies Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ]
+  }
+    },
+
+    "BS Interior Design": {
+    "version": "Interior Design 4-Year Study Plan",
+    "total_credit_hours": 136,
+    "levels": {
+      "1": [
+        {"course_code": "INTD101", "title": "Drawing I", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD111", "title": "Basic Design Studio I", "credits": 4, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD121", "title": "History of Architecture I", "credits": 2, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+        {"course_code": "MATH121", "title": "Applied Mathematics for Architecture", "credits": 3, "prerequisite": "MATH002", "type": "Department", "requirement": "Required"},
+        {"course_code": "ENGL101", "title": "First Year Composition", "credits": 3, "prerequisite": "ENGL005", "type": "Institution", "requirement": "Required"},
+        {"course_code": "GHALxxx", "title": "Humanities, Arts and Languages Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+      ],
+      "2": [
+        {"course_code": "INTD102", "title": "Drawing II", "credits": 3, "prerequisite": "INTD101", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD112", "title": "Basic Design Studio II", "credits": 4, "prerequisite": "INTD111", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD122", "title": "History of Architecture II", "credits": 2, "prerequisite": "INTD121", "type": "Department", "requirement": "Required"},
+        {"course_code": "PHYS122", "title": "Applied Physics for Architecture", "credits": 3, "prerequisite": "MATH121", "type": "Department", "requirement": "Required"},
+        {"course_code": "ENGL102", "title": "Introduction to Report Writing", "credits": 3, "prerequisite": "ENGL101", "type": "Institution", "requirement": "Required"},
+        {"course_code": "GDMCxxx", "title": "Diversity and Multiculturalism Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+      ],
+      "3": [
+        {"course_code": "INTD201", "title": "CAD Applications", "credits": 2, "prerequisite": "INTD102", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD211", "title": "Design Studio I: Residential", "credits": 4, "prerequisite": "INTD112", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD221", "title": "History of Interior Design", "credits": 2, "prerequisite": "INTD122", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD223", "title": "Color Theory", "credits": 2, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD241", "title": "Construction, Systems & Technology I", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD371", "title": "Space Planning, Programming & Building Regulation", "credits": 2, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD294", "title": "Summer Field Experience I (Optional)", "credits": 1, "prerequisite": "-", "type": "Department", "requirement": "Elective"}
+      ],
+      "4": [
+        {"course_code": "INTD202", "title": "Advanced CAD & Digital Design", "credits": 2, "prerequisite": "INTD201", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD212", "title": "Design Studio II: Office Interiors", "credits": 4, "prerequisite": "INTD211", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD222", "title": "Architecture & Heritage in Saudi Arabia", "credits": 2, "prerequisite": "INTD221", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD232", "title": "Model-Making Techniques", "credits": 2, "prerequisite": "INTD201", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD242", "title": "Construction, Systems & Technology II", "credits": 3, "prerequisite": "INTD241", "type": "Department", "requirement": "Required"},
+        {"course_code": "GIAS101", "title": "Islamic Culture", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required"}
+      ],
+      "5": [
+        {"course_code": "INTD311", "title": "Design Studio III: Commercial", "credits": 4, "prerequisite": "INTD212", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD321", "title": "Behavior Factors in Interior Design", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD331", "title": "Portfolio Presentation: Methods and Media", "credits": 2, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD351", "title": "Furniture Design", "credits": 3, "prerequisite": "INTD201", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD361", "title": "Environmental Design Principles", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+        {"course_code": "ENGL201", "title": "Technical Writing", "credits": 3, "prerequisite": "ENGL102", "type": "Institution", "requirement": "Required"},
+        {"course_code": "INTD394", "title": "Summer Field Experience II", "credits": 1, "prerequisite": "Junior status", "type": "Department", "requirement": "Required"}
+      ],
+      "6": [
+        {"course_code": "INTD312", "title": "Design Studio IV: Hospitality", "credits": 4, "prerequisite": "INTD311", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD342", "title": "Detailing & Construction Documents", "credits": 3, "prerequisite": "INTD242", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD344", "title": "Interior Lighting Design", "credits": 2, "prerequisite": "INTD211", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD352", "title": "Finishing Materials & Textiles", "credits": 2, "prerequisite": "INTD351", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD4xx", "title": "Professional Elective I", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"},
+        {"course_code": "GIAS102", "title": "Arabic Language Skills", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required"}
+      ],
+      "7": [
+        {"course_code": "INTD411", "title": "Design Studio V: Specific Buildings", "credits": 4, "prerequisite": "INTD312", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD461", "title": "Sustainable Interior Environment", "credits": 2, "prerequisite": "INTD361", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD491", "title": "Capstone Project I", "credits": 2, "prerequisite": "Senior Status (>=98 credits)", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD4xx", "title": "Professional Elective II", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"},
+        {"course_code": "INTD4xx", "title": "Professional Elective III", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"},
+        {"course_code": "GSOSxxx", "title": "Social Sciences Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+      ],
+      "8": [
+        {"course_code": "INTD442", "title": "Contracts, Specifications & Quantity Surveying", "credits": 2, "prerequisite": "INTD342", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD472", "title": "Project Management & Professional Practices", "credits": 3, "prerequisite": "Senior Status (>=98 credits)", "type": "Department", "requirement": "Required"},
+        {"course_code": "INTD492", "title": "Capstone Project II", "credits": 5, "prerequisite": "INTD491", "type": "Department", "requirement": "Required"},
+        {"course_code": "XXXXxxx", "title": "Free Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"},
+        {"course_code": "GIASxxx", "title": "Islamic Studies Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+      ]
+    }
+    },
+
+    "BBA Management": {
+  "version": "2025-2026",
+  "total_credit_hours": 127,
+  "levels": {
+    "1": [
+      {"course_code": "ECON101", "title": "Introduction to Microeconomy", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+      {"course_code": "CS115", "title": "Intro to Computing for Business", "credits": 3, "prerequisite": "PCS001", "type": "College", "requirement": "Required"},
+      {"course_code": "MATH111", "title": "Applied Calculus I", "credits": 3, "prerequisite": "MATH012", "type": "Department", "requirement": "Required"},
+      {"course_code": "ENGL101", "title": "First Year Composition", "credits": 3, "prerequisite": "ENGL005", "type": "Institution", "requirement": "Required"},
+      {"course_code": "GHALxxx", "title": "Humanities, Arts, and Languages Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+    ],
+    "2": [
+      {"course_code": "ECON102", "title": "Introduction to Macroeconomy", "credits": 3, "prerequisite": "ECON101", "type": "Department", "requirement": "Required"},
+      {"course_code": "MGT101", "title": "Introduction to Management", "credits": 3, "prerequisite": "ENGL005", "type": "Department", "requirement": "Required"},
+      {"course_code": "MATH112", "title": "Calculus II", "credits": 3, "prerequisite": "MATH111", "type": "Department", "requirement": "Required"},
+      {"course_code": "ENGL102", "title": "Introduction to Report Writing", "credits": 3, "prerequisite": "ENGL101", "type": "Institution", "requirement": "Required"},
+      {"course_code": "GDMCxxx", "title": "Diversity and Multiculturism Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+    ],
+    "3": [
+      {"course_code": "ACCT201", "title": "Intro to Financial Accounting", "credits": 3, "prerequisite": "MATH111", "type": "Department", "requirement": "Required"},
+      {"course_code": "STAT211", "title": "Statistics for Business I", "credits": 3, "prerequisite": "MATH112", "type": "Department", "requirement": "Required"},
+      {"course_code": "PHSC113", "title": "Physical Science", "credits": 4, "prerequisite": "MATH111", "type": "Department", "requirement": "Required"},
+      {"course_code": "GIAS101", "title": "Islamic Culture", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required"},
+      {"course_code": "ENGL201", "title": "Technical Writing", "credits": 3, "prerequisite": "ENGL102", "type": "Institution", "requirement": "Required"},
+      {"course_code": "MIS201", "title": "Management Information Systems", "credits": 3, "prerequisite": "CS115", "type": "Department", "requirement": "Required"}
+    ],
+    "4": [
+      {"course_code": "MKT201", "title": "Intro to Marketing", "credits": 3, "prerequisite": "ENGL201", "type": "Department", "requirement": "Required"},
+      {"course_code": "ENT201", "title": "Introduction to Entrepreneurship", "credits": 3, "prerequisite": "ENGL201", "type": "Department", "requirement": "Required"},
+      {"course_code": "ACCT202", "title": "Introduction to Managerial Accounting", "credits": 3, "prerequisite": "ACCT201", "type": "Department", "requirement": "Required"},
+      {"course_code": "GIAS102", "title": "Arabic Language Skills", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required"},
+      {"course_code": "MGT222", "title": "Organizational Behavior", "credits": 3, "prerequisite": "MGT101", "type": "Department", "requirement": "Required"}
+    ],
+    "5": [
+      {"course_code": "MGT321", "title": "Human Resources Management", "credits": 3, "prerequisite": "MKT201", "type": "Department", "requirement": "Required"},
+      {"course_code": "MGT331", "title": "Business Communication", "credits": 3, "prerequisite": "ENGL201", "type": "Department", "requirement": "Required"},
+      {"course_code": "FIN301", "title": "Financial Management", "credits": 3, "prerequisite": "ACCT201", "type": "Department", "requirement": "Required"},
+      {"course_code": "STAT311", "title": "Statistics for Business II", "credits": 3, "prerequisite": "STAT211", "type": "Department", "requirement": "Required"},
+      {"course_code": "GSOSxxx", "title": "Social Sciences Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+    ],
+    "6": [
+      {"course_code": "MGT312", "title": "Operations Management", "credits": 3, "prerequisite": "STAT211", "type": "Department", "requirement": "Required"},
+      {"course_code": "MGT332", "title": "Leadership", "credits": 3, "prerequisite": "MGT222", "type": "Department", "requirement": "Required"},
+      {"course_code": "MGT352", "title": "International Marketing", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Required"},
+      {"course_code": "ECON362", "title": "Economy of Saudi Arabia", "credits": 3, "prerequisite": "ECON202", "type": "Department", "requirement": "Required"},
+      {"course_code": "MGT311", "title": "Legal Environment of Business", "credits": 3, "prerequisite": "ENGL201", "type": "Department", "requirement": "Required"},
+      {"course_code": "MKT394", "title": "Summer Practical Training", "credits": 3, "prerequisite": "End of Third Year", "type": "Department", "requirement": "Required"}
+    ],
+    "7": [
+      {"course_code": "MGT421", "title": "Corporate Governance", "credits": 3, "prerequisite": "MGT311", "type": "Department", "requirement": "Required"},
+      {"course_code": "MGT461", "title": "Strategic Management", "credits": 3, "prerequisite": "MGT311", "type": "Department", "requirement": "Required"},
+      {"course_code": "BUSXXX", "title": "Business Elective I", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"},
+      {"course_code": "BUSXXX", "title": "Business Elective II", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"},
+      {"course_code": "FREE", "title": "Free Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+    ],
+    "8": [
+      {"course_code": "MKT432", "title": "Marketing Research", "credits": 3, "prerequisite": "MKT201, STAT311", "type": "Department", "requirement": "Required"},
+      {"course_code": "MGT411", "title": "Supply Chain Management", "credits": 3, "prerequisite": "MGT312", "type": "Department", "requirement": "Required"},
+      {"course_code": "MKTxxx", "title": "Professional Elective I", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"},
+      {"course_code": "MKTxxx2", "title": "Professional Elective II", "credits": 3, "prerequisite": "-", "type": "Department", "requirement": "Elective"},
+      {"course_code": "GIASxxx", "title": "Islamic Studies Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective"}
+    ]
+  }
+    },
+
+    "BBA Marketing": {
+    "version": "2025-2026",
+    "total_credit_hours": 127,
+    "levels": {
+      "1": [
+        {
+          "course_code": "ECON101",
+          "title": "Introduction to Microeconomy",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "CS115",
+          "title": "Intro to Computing for Business",
+          "credits": 3,
+          "prerequisite": "PCS001",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MATH111",
+          "title": "Applied Calculus I",
+          "credits": 3,
+          "prerequisite": "MATH012",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "ENGL101",
+          "title": "First Year Composition",
+          "credits": 3,
+          "prerequisite": "ENGL005",
+          "type": "Institution",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "GHALxxx",
+          "title": "Humanities, Arts, and Languages Elective",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "Institution",
+          "requirement": "Elective"
+        }
+      ],
+      "2": [
+        {
+          "course_code": "ECON102",
+          "title": "Introduction to Macroeconomy",
+          "credits": 3,
+          "prerequisite": "ECON101",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MGT101",
+          "title": "Introduction to Management",
+          "credits": 3,
+          "prerequisite": "ENGL005",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MATH112",
+          "title": "Calculus II",
+          "credits": 3,
+          "prerequisite": "MATH111",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "ENGL102",
+          "title": "Introduction to Report Writing",
+          "credits": 3,
+          "prerequisite": "ENGL101",
+          "type": "Institution",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "GDMCxxx",
+          "title": "Diversity and Multiculturalism Elective",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "Institution",
+          "requirement": "Elective"
+        }
+      ],
+      "3": [
+        {
+          "course_code": "ACCT201",
+          "title": "Intro to Financial Accounting",
+          "credits": 3,
+          "prerequisite": "MATH111",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "STAT211",
+          "title": "Statistics for Business I",
+          "credits": 3,
+          "prerequisite": "MATH112",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "PHSC113",
+          "title": "Physical Science",
+          "credits": 4,
+          "prerequisite": "MATH111",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "GIAS101",
+          "title": "Islamic Culture",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "Institution",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "ENGL201",
+          "title": "Technical Writing",
+          "credits": 3,
+          "prerequisite": "ENGL102",
+          "type": "Institution",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MIS201",
+          "title": "Management Information Systems",
+          "credits": 3,
+          "prerequisite": "CS115",
+          "type": "College",
+          "requirement": "Required"
+        }
+      ],
+      "4": [
+        {
+          "course_code": "MKT201",
+          "title": "Intro to Marketing",
+          "credits": 3,
+          "prerequisite": "ENGL201",
+          "type": "Department",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "ENT201",
+          "title": "Introduction to Entrepreneurship",
+          "credits": 3,
+          "prerequisite": "ENGL201",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "ACCT202",
+          "title": "Introduction to Managerial Accounting",
+          "credits": 3,
+          "prerequisite": "ACCT201",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "GIAS102",
+          "title": "Arabic Language Skills",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "Institution",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MGT222",
+          "title": "Organizational Behavior",
+          "credits": 3,
+          "prerequisite": "MGT101",
+          "type": "College",
+          "requirement": "Required"
+        }
+      ],
+      "5": [
+        {
+          "course_code": "MKT311",
+          "title": "Consumer Behavior",
+          "credits": 3,
+          "prerequisite": "MKT201",
+          "type": "Department",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MGT331",
+          "title": "Business Communication",
+          "credits": 3,
+          "prerequisite": "ENGL201",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "FIN301",
+          "title": "Financial Management",
+          "credits": 3,
+          "prerequisite": "ACCT201",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "STAT311",
+          "title": "Statistics for Business II",
+          "credits": 3,
+          "prerequisite": "STAT211",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "GSOSxxx",
+          "title": "Social Sciences Elective",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "Institution",
+          "requirement": "Elective"
+        }
+      ],
+      "6": [
+        {
+          "course_code": "MGT312",
+          "title": "Operations Management",
+          "credits": 3,
+          "prerequisite": "STAT211",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MGT332",
+          "title": "Leadership",
+          "credits": 3,
+          "prerequisite": "MGT222",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MKT332",
+          "title": "Marketing Channels",
+          "credits": 3,
+          "prerequisite": "MKT311",
+          "type": "Department",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MKT362",
+          "title": "Marketing Strategy",
+          "credits": 3,
+          "prerequisite": "MKT311",
+          "type": "Department",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MGT311",
+          "title": "Legal Environment of Business",
+          "credits": 3,
+          "prerequisite": "ENGL201",
+          "type": "College",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MKT394",
+          "title": "Summer Practical Training",
+          "credits": 3,
+          "prerequisite": "Year 3 Core Courses",
+          "type": "Department",
+          "requirement": "Required"
+        }
+      ],
+      "7": [
+        {
+          "course_code": "MKT421",
+          "title": "Marketing Communication",
+          "credits": 3,
+          "prerequisite": "MKT311",
+          "type": "Department",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MKT453",
+          "title": "International Marketing",
+          "credits": 3,
+          "prerequisite": "MKT311",
+          "type": "Department",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "BUSxxx",
+          "title": "Business Elective I",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "College",
+          "requirement": "Elective"
+        },
+        {
+          "course_code": "BUSxxx",
+          "title": "Business Elective II",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "College",
+          "requirement": "Elective"
+        },
+        {
+          "course_code": "FREExxx",
+          "title": "Free Elective",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "Institution",
+          "requirement": "Elective"
+        }
+      ],
+      "8": [
+        {
+          "course_code": "MKT432",
+          "title": "Marketing Research",
+          "credits": 3,
+          "prerequisite": "MKT201, STAT311",
+          "type": "Department",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MKT451",
+          "title": "Digital Marketing",
+          "credits": 3,
+          "prerequisite": "MKT201, MKT311",
+          "type": "Department",
+          "requirement": "Required"
+        },
+        {
+          "course_code": "MKTxxx",
+          "title": "Professional Elective I",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "Department",
+          "requirement": "Elective"
+        },
+        {
+          "course_code": "MKTxxx",
+          "title": "Professional Elective II",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "Department",
+          "requirement": "Elective"
+        },
+        {
+          "course_code": "GIASxxx",
+          "title": "Islamic Studies Elective",
+          "credits": 3,
+          "prerequisite": "-",
+          "type": "Institution",
+          "requirement": "Elective"
+        }
+      ]
+    }
+    },
+
+    "BS in Accounting": {
+  "version": "2019-2020",
+  "total_credit_hours": 127,
+  "levels": {
+    "1": [
+      {
+        "course_code": "ECON101",
+        "title": "Introduction to Microeconomy",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CS115",
+        "title": "Introduction to Computing for Business",
+        "credits": 3,
+        "prerequisite": "PCS001",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MATH111",
+        "title": "Applied Calculus I",
+        "credits": 3,
+        "prerequisite": "MATH012",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL101",
+        "title": "First Year Composition",
+        "credits": 3,
+        "prerequisite": "ENGL005",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GHALxxx",
+        "title": "Humanities, Arts and Languages Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "2": [
+      {
+        "course_code": "ECON102",
+        "title": "Introduction to Macroeconomy",
+        "credits": 3,
+        "prerequisite": "ECON101",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MGT101",
+        "title": "Introduction to Management",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MATH112",
+        "title": "Applied Calculus II",
+        "credits": 3,
+        "prerequisite": "MATH111",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL102",
+        "title": "Introduction to Report Writing",
+        "credits": 3,
+        "prerequisite": "ENGL101",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GDMCxxx",
+        "title": "Diversity and Multiculturalism Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "3": [
+      {
+        "course_code": "ACCT201",
+        "title": "Introduction to Financial Accounting",
+        "credits": 3,
+        "prerequisite": "MATH112",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MIS201",
+        "title": "Management Information Systems",
+        "credits": 3,
+        "prerequisite": "CS115",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "STAT211",
+        "title": "Statistics for Business I",
+        "credits": 3,
+        "prerequisite": "MATH112",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "PHSC113",
+        "title": "Physical Science",
+        "credits": 4,
+        "prerequisite": "MATH111",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL201",
+        "title": "Technical Writing",
+        "credits": 3,
+        "prerequisite": "ENGL102",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS101",
+        "title": "Islamic Culture",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      }
+    ],
+
+    "4": [
+      {
+        "course_code": "ACCT202",
+        "title": "Introduction to Managerial Accounting",
+        "credits": 3,
+        "prerequisite": "ACCT201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MGT222",
+        "title": "Organizational Behaviour",
+        "credits": 3,
+        "prerequisite": "MGT101",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MKT201",
+        "title": "Introduction to Marketing",
+        "credits": 3,
+        "prerequisite": "ENG201",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENT201",
+        "title": "Introduction to Entrepreneurship",
+        "credits": 3,
+        "prerequisite": "ENG201",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS102",
+        "title": "Arabic Language Skills",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      }
+    ],
+
+    "5": [
+      {
+        "course_code": "ACCT321",
+        "title": "Intermediate Accounting",
+        "credits": 3,
+        "prerequisite": "ACCT202",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MGT331",
+        "title": "Business Communication",
+        "credits": 3,
+        "prerequisite": "ENGL201",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "FIN301",
+        "title": "Financial Management",
+        "credits": 3,
+        "prerequisite": "ACCT201",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "STAT311",
+        "title": "Statistics for Business II",
+        "credits": 3,
+        "prerequisite": "STAT211",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GSOSxxx",
+        "title": "Social Sciences Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "6": [
+      {
+        "course_code": "MGT312",
+        "title": "Operations Management",
+        "credits": 3,
+        "prerequisite": "STAT311",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ACCT312",
+        "title": "Financial Accounting and Reporting",
+        "credits": 3,
+        "prerequisite": "ACCT201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ACCT322",
+        "title": "Cost Accounting",
+        "credits": 3,
+        "prerequisite": "ACCT201, ACCT202",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ECON362",
+        "title": "Economy of Saudi Arabia",
+        "credits": 3,
+        "prerequisite": "ECON102",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MGT311",
+        "title": "Legal Environment of Business",
+        "credits": 3,
+        "prerequisite": "ENG201",
+        "type": "College",
+        "requirement": "Required"
+      }
+    ],
+
+    "7": [
+      {
+        "course_code": "FIN394",
+        "title": "Summer Field Experience",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Required"
+      }
+    ],
+
+    "8": [
+      {
+        "course_code": "ACCT431",
+        "title": "Tax Accounting",
+        "credits": 3,
+        "prerequisite": "ACCT201, ACCT202",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ACCT441",
+        "title": "Auditing",
+        "credits": 3,
+        "prerequisite": "ACCT201, ACCT202, ACCT321",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "BUSxxx",
+        "title": "BUS Elective I",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "BUSxxx",
+        "title": "BUS Elective II",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "XXXxxx",
+        "title": "Free Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+
+    "9": [
+      {
+        "course_code": "ACCT422",
+        "title": "Accounting Information System",
+        "credits": 3,
+        "prerequisite": "ACCT201, ACCT202",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ACCT452",
+        "title": "International Accounting",
+        "credits": 3,
+        "prerequisite": "ACCT202",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ACCTxxx",
+        "title": "Professional Course I",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "ACCTxxx",
+        "title": "Professional Course II",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "GIASxxx",
+        "title": "Islamic Studies Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ]
+  },
+
+  "slot_rules": {
+    "BUSxxx": {
+      "title": "Business Elective",
+      "prefixes": ["BUS", "MGT", "FIN", "MKT", "ENT"],
+      "specific": []
+    },
+    "ACCTxxx": {
+      "title": "Professional Accounting Elective",
+      "prefixes": ["ACCT"],
+      "specific": []
+    },
+    "XXXxxx": {
+      "title": "Free Elective",
+      "prefixes": [],
+      "specific": []
+    }
+  }
+    },
+
+    "BS in Finance": {
+  "version": "2019–2020",
+  "total_credit_hours": 127,
+  "levels": {
+    "1": [
+      {
+        "course_code": "ECON101",
+        "title": "Introduction to Micro economy",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "CS115",
+        "title": "Introduction to Computing for Business",
+        "credits": 3,
+        "prerequisite": "PCS001",
+        "type": "College",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MATH111",
+        "title": "Applied Calculus I",
+        "credits": 3,
+        "prerequisite": "MATH012",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL101",
+        "title": "First Year Composition",
+        "credits": 3,
+        "prerequisite": "ENGL005",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GHALXXX",
+        "title": "Humanities, Arts and Languages Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+    "2": [
+      {
+        "course_code": "ECON102",
+        "title": "Introduction to Macro economy",
+        "credits": 3,
+        "prerequisite": "ECON101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MGT101",
+        "title": "Introduction to Management",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MATH112",
+        "title": "Applied Calculus II",
+        "credits": 3,
+        "prerequisite": "MATH111",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL102",
+        "title": "Introduction to Report Writing",
+        "credits": 3,
+        "prerequisite": "ENGL101",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GDMCXXX",
+        "title": "Diversity and Multiculturalism Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+    "3": [
+      {
+        "course_code": "ACCT201",
+        "title": "Introduction to Financial Accounting",
+        "credits": 3,
+        "prerequisite": "MATH112",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MIS201",
+        "title": "Management Information System",
+        "credits": 3,
+        "prerequisite": "CS115",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "STAT211",
+        "title": "Statistics for Business I",
+        "credits": 3,
+        "prerequisite": "MATH112",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "PHSC113",
+        "title": "Physical Science",
+        "credits": 4,
+        "prerequisite": "MATH111",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENGL201",
+        "title": "Technical Writing",
+        "credits": 3,
+        "prerequisite": "ENGL102",
+        "type": "Institution",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS101",
+        "title": "Islamic Culture",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      }
+    ],
+    "4": [
+      {
+        "course_code": "ACCT202",
+        "title": "Introduction to Managerial Accounting",
+        "credits": 3,
+        "prerequisite": "ACCT201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MGT222",
+        "title": "Organizational Behaviour",
+        "credits": 3,
+        "prerequisite": "MGT101",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MKT201",
+        "title": "Introduction to Marketing",
+        "credits": 3,
+        "prerequisite": "ENGL201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ENT201",
+        "title": "Introduction to Entrepreneurship",
+        "credits": 3,
+        "prerequisite": "ENGL201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GIAS102",
+        "title": "Arabic Language Skills",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Required"
+      }
+    ],
+    "5": [
+      {
+        "course_code": "ACCT321",
+        "title": "Intermediate Accounting",
+        "credits": 3,
+        "prerequisite": "ACCT202",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MGT331",
+        "title": "Business Communication",
+        "credits": 3,
+        "prerequisite": "ENGL201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "FIN301",
+        "title": "Financial Management",
+        "credits": 3,
+        "prerequisite": "ACCT201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "STAT311",
+        "title": "Statistics for Business II",
+        "credits": 3,
+        "prerequisite": "STAT211",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "GSOSXXX",
+        "title": "Social Sciences Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ],
+    "6": [
+      {
+        "course_code": "MGT312",
+        "title": "Operation Management",
+        "credits": 3,
+        "prerequisite": "STAT311",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "FIN312",
+        "title": "Corporate Finance",
+        "credits": 3,
+        "prerequisite": "FIN301",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "FIN322",
+        "title": "Financial Market and Institutions",
+        "credits": 3,
+        "prerequisite": "FIN301",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "ECON362",
+        "title": "Economy of Saudi Arabia",
+        "credits": 3,
+        "prerequisite": "ECON102",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "MGT311",
+        "title": "Legal Environment of Business",
+        "credits": 3,
+        "prerequisite": "ENGL201",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "FIN394",
+        "title": "Summer Field Experience",
+        "credits": 3,
+        "prerequisite": "Junior Standing",
+        "type": "Department",
+        "requirement": "Required"
+      }
+    ],
+    "7": [
+      {
+        "course_code": "FIN431",
+        "title": "Investment",
+        "credits": 3,
+        "prerequisite": "FIN301, STAT311",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "FIN451",
+        "title": "International Finance",
+        "credits": 3,
+        "prerequisite": "FIN301",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "BUSXXX",
+        "title": "Business Elective I",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "BUSXXX",
+        "title": "Business Elective II",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "XXXxxx",
+        "title": "Free Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "College",
+        "requirement": "Elective"
+      }
+    ],
+    "8": [
+      {
+        "course_code": "FIN432",
+        "title": "Financial Modeling",
+        "credits": 3,
+        "prerequisite": "FIN431, FIN312",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "FIN434",
+        "title": "Portfolio Management",
+        "credits": 3,
+        "prerequisite": "FIN431, FIN312",
+        "type": "Department",
+        "requirement": "Required"
+      },
+      {
+        "course_code": "FINXXX",
+        "title": "Professional Course I",
+        "credits": 3,
+        "prerequisite": "College Approval",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "FINXXX",
+        "title": "Professional Course II",
+        "credits": 3,
+        "prerequisite": "College Approval",
+        "type": "Department",
+        "requirement": "Elective"
+      },
+      {
+        "course_code": "GIASXXX",
+        "title": "Islamic Studies Elective",
+        "credits": 3,
+        "prerequisite": "-",
+        "type": "Institution",
+        "requirement": "Elective"
+      }
+    ]
+  },
+  "slot_rules": {
+    "GHALXXX": {
+      "title": "Humanities, Arts and Languages Elective",
+      "prefixes": ["GHAL"],
+      "specific": []
+    },
+    "GDMCXXX": {
+      "title": "Diversity and Multiculturalism Elective",
+      "prefixes": ["GDMC"],
+      "specific": []
+    },
+    "GSOSXXX": {
+      "title": "Social Sciences Elective",
+      "prefixes": ["GSOS"],
+      "specific": []
+    },
+    "GIASXXX": {
+      "title": "Islamic Studies Elective",
+      "prefixes": ["GIAS"],
+      "specific": []
+    },
+    "BUSXXX": {
+      "title": "Business Elective",
+      "prefixes": ["BUS"],
+      "specific": []
+    },
+    "FINXXX": {
+      "title": "Finance Professional Elective",
+      "prefixes": ["FIN"],
+      "specific": []
+    },
+    "XXXxxx": {
+      "title": "Free Elective",
+      "prefixes": [],
+      "specific": []
+    }
+  }
+    },
+
+    "BS in International Hospitality Management": {
+  "version": "POS July 2020",
+  "total_credit_hours": 127,
+  "levels": {
+    "1": [
+      { "course_code": "HOSP101", "title": "Kitchen Production I (Fine Dining, Food Culture, Hot and Cold, Finger Food)", "credits": 2, "prerequisite": "-", "type": "Program", "requirement": "Required" },
+      { "course_code": "HOSP102", "title": "Kitchen Production II (Pastry, Dessert and Pastry Making)", "credits": 2, "prerequisite": "-", "type": "Program", "requirement": "Required" },
+      { "course_code": "HOSP103", "title": "Food and Beverage Services (Fine Dining and Lounge – Food Court and Coffee Shop)", "credits": 2, "prerequisite": "-", "type": "Program", "requirement": "Required" },
+      { "course_code": "HOSP105", "title": "Rooms Division (Housekeeping, Accommodation, Front Office, Butler Services, Laundry and Public Areas)", "credits": 2, "prerequisite": "-", "type": "Program", "requirement": "Required" },
+      { "course_code": "HOSP104", "title": "Stewarding", "credits": 1, "prerequisite": "-", "type": "Program", "requirement": "Required" },
+      { "course_code": "HOSP107", "title": "Hygiene, Safety and Nutrition", "credits": 1, "prerequisite": "-", "type": "Program", "requirement": "Required" },
+      { "course_code": "HMGT101", "title": "Introduction to Hospitality", "credits": 1, "prerequisite": "-", "type": "Program", "requirement": "Required" },
+      { "course_code": "HMGT103", "title": "International Business Protocol", "credits": 1, "prerequisite": "-", "type": "Program", "requirement": "Required" },
+      { "course_code": "HOSP110", "title": "Field Trip", "credits": 0, "prerequisite": "-", "type": "Program", "requirement": "Required" },
+      { "course_code": "ENGL103", "title": "Applied English I", "credits": 2, "prerequisite": "-", "type": "Institution", "requirement": "Required" },
+      { "course_code": "GHALXXX", "title": "Foreign Language I (French)", "credits": 2, "prerequisite": "-", "type": "Institution", "requirement": "Elective" },
+      { "course_code": "CS117", "title": "Computer Application I", "credits": 1, "prerequisite": "-", "type": "College", "requirement": "Required" },
+      { "course_code": "GIAS101", "title": "Islamic Education", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required" }
+    ],
+    "2": [
+      { "course_code": "HOSP192", "title": "Industry Internship I", "credits": 6, "prerequisite": "HOSP101, HOSP102, HOSP103, HOSP104, HOSP105", "type": "Program", "requirement": "Required" }
+    ],
+    "3": [
+      { "course_code": "HMGT203", "title": "Food and Beverage Management (Cost Control, Banqueting and Catering)", "credits": 2, "prerequisite": "HOSP103", "type": "Program", "requirement": "Required" },
+      { "course_code": "HMGT205", "title": "Room Division Management I (Supervision & MICE)", "credits": 2, "prerequisite": "HOSP105", "type": "Program", "requirement": "Required" },
+      { "course_code": "MKT203", "title": "Introduction to Marketing", "credits": 1, "prerequisite": "HMGT101", "type": "College", "requirement": "Required" },
+      { "course_code": "MGT221", "title": "Human Resource Management", "credits": 2, "prerequisite": "HMGT101", "type": "College", "requirement": "Required" },
+      { "course_code": "HMGT231", "title": "Event Management and Operations", "credits": 1, "prerequisite": "HMGT101", "type": "Program", "requirement": "Required" },
+      { "course_code": "ACCT203", "title": "Financial Accounting – Uniform System of Accounts", "credits": 2, "prerequisite": "HMGT101", "type": "College", "requirement": "Required" },
+      { "course_code": "HMGT201", "title": "Accommodation Theory PMS", "credits": 1, "prerequisite": "HOSP105", "type": "Program", "requirement": "Required" },
+      { "course_code": "ENGL203", "title": "Applied English II", "credits": 3, "prerequisite": "ENGL103", "type": "Institution", "requirement": "Required" },
+      { "course_code": "GHALXXX2", "title": "Foreign Language II (French)", "credits": 1, "prerequisite": "GHALXXX", "type": "Institution", "requirement": "Elective" },
+      { "course_code": "CS217", "title": "Computer Application II", "credits": 2, "prerequisite": "CS117", "type": "College", "requirement": "Required" },
+      { "course_code": "STAT212", "title": "Statistics", "credits": 2, "prerequisite": "-", "type": "College", "requirement": "Required" }
+    ],
+    "4": [
+      { "course_code": "HMGT242", "title": "Hospitality Economics", "credits": 2, "prerequisite": "HMGT101", "type": "Program", "requirement": "Required" },
+      { "course_code": "HMGT216", "title": "Rooms Division Management II", "credits": 1, "prerequisite": "HMGT205", "type": "Program", "requirement": "Required" },
+      { "course_code": "HMGT218", "title": "Facilities Management", "credits": 1, "prerequisite": "HMGT101", "type": "Program", "requirement": "Required" },
+      { "course_code": "FIN202", "title": "Financial Analysis", "credits": 2, "prerequisite": "ACCT203", "type": "College", "requirement": "Required" },
+      { "course_code": "ECON204", "title": "Macroeconomics", "credits": 2, "prerequisite": "HMGT101", "type": "College", "requirement": "Required" },
+      { "course_code": "MKT212", "title": "Hospitality Marketing and Sales (Direct Selling and Customer Service)", "credits": 2, "prerequisite": "MKT203", "type": "College", "requirement": "Required" },
+      { "course_code": "HMGT222", "title": "Ethics and Law", "credits": 3, "prerequisite": "HMGT103", "type": "Program", "requirement": "Required" },
+      { "course_code": "ENGL212", "title": "Academic Writing", "credits": 2, "prerequisite": "ENGL103", "type": "Institution", "requirement": "Required" },
+      { "course_code": "GHALXXX3", "title": "Foreign Language III (French)", "credits": 1, "prerequisite": "GHALXXX2", "type": "Institution", "requirement": "Elective" },
+      { "course_code": "ENGL214", "title": "Communication Skills", "credits": 2, "prerequisite": "ENGL103", "type": "Institution", "requirement": "Required" }
+    ],
+    "5": [
+      { "course_code": "FIN311", "title": "Revenue Management", "credits": 2, "prerequisite": "FIN202, MKT212", "type": "College", "requirement": "Required" },
+      { "course_code": "ACCT311", "title": "Managerial Accounting", "credits": 2, "prerequisite": "ACCT203", "type": "College", "requirement": "Required" },
+      { "course_code": "HMGT311", "title": "Luxury Brand Management in Hospitality", "credits": 2, "prerequisite": "HMGT101", "type": "Program", "requirement": "Required" },
+      { "course_code": "HMGT313", "title": "Service Operation Management", "credits": 2, "prerequisite": "HMGT101", "type": "Program", "requirement": "Required" },
+      { "course_code": "MGT327", "title": "Project Management", "credits": 2, "prerequisite": "HMGT101", "type": "College", "requirement": "Required" },
+      { "course_code": "MGT323", "title": "Talent Management System", "credits": 2, "prerequisite": "MGT221", "type": "College", "requirement": "Required" },
+      { "course_code": "MGT325", "title": "Career Management I", "credits": 1, "prerequisite": "MGT221", "type": "College", "requirement": "Required" },
+      { "course_code": "XXXXCOL1", "title": "College Elective I", "credits": 3, "prerequisite": "-", "type": "College", "requirement": "Elective" }
+    ],
+    "6": [
+      { "course_code": "HOSP394", "title": "Industry Internship II", "credits": 6, "prerequisite": "FIN311, ACCT311, HMGT313", "type": "Program", "requirement": "Required" },
+      { "course_code": "XXXXCOL2", "title": "College Elective II", "credits": 3, "prerequisite": "-", "type": "College", "requirement": "Elective" }
+    ],
+    "7": [
+      { "course_code": "HMGT421", "title": "Corporate Strategy", "credits": 3, "prerequisite": "MGT221", "type": "Program", "requirement": "Required" },
+      { "course_code": "FIN312", "title": "Corporate Finance", "credits": 3, "prerequisite": "ACCT203", "type": "College", "requirement": "Required" },
+      { "course_code": "MKT462", "title": "Service Marketing Strategy", "credits": 2, "prerequisite": "MKT203", "type": "College", "requirement": "Required" },
+      { "course_code": "HMGT428", "title": "Sustainable Development of Hospitality/Tourism Offers", "credits": 3, "prerequisite": "HMGT313", "type": "Program", "requirement": "Required" },
+      { "course_code": "HMGT425", "title": "Crisis and Security Management", "credits": 2, "prerequisite": "HMGT101", "type": "Program", "requirement": "Required" },
+      { "course_code": "HMGT432", "title": "Cross Cultural Management", "credits": 3, "prerequisite": "HMGT101", "type": "Program", "requirement": "Required" },
+      { "course_code": "HMGT411", "title": "Resort and Destination Management", "credits": 2, "prerequisite": "HMGT101", "type": "Program", "requirement": "Required" },
+      { "course_code": "GIAS102", "title": "Arabic Language", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required" },
+      { "course_code": "HMGTEL1", "title": "Program Elective I", "credits": 3, "prerequisite": "-", "type": "Program", "requirement": "Elective" },
+      { "course_code": "HMGTEL2", "title": "Program Elective II", "credits": 3, "prerequisite": "-", "type": "Program", "requirement": "Elective" }
+    ],
+    "8": [
+      { "course_code": "MGT422", "title": "Innovation Management", "credits": 3, "prerequisite": "HMGT101", "type": "College", "requirement": "Required" },
+      { "course_code": "ENT201", "title": "Entrepreneurship", "credits": 3, "prerequisite": "HMGT101", "type": "College", "requirement": "Required" },
+      { "course_code": "HMGT492", "title": "Hospitality/Tourism Student Business Projects", "credits": 6, "prerequisite": "MGT325", "type": "Program", "requirement": "Required" }
+    ]
+  },
+  "slot_rules": {
+    "CollegeElective": {
+      "title": "College Elective (Business/Tourism)",
+      "prefixes": ["ENT", "HMGT", "MGT", "MKT", "BUS", "FIN", "ACCT", "ECON"],
+      "specific": ["ENT373", "HMGT371", "MGT372", "BUS310"]
+    },
+    "ProgramElective": {
+      "title": "Program Elective (Hospitality)",
+      "prefixes": ["HMGT"],
+      "specific": ["HMGT471", "HMGT472", "HMGT485", "HMGT474"]
+    }
+  }
+    },
+
+    "BS in Cybersecurity and Digital Forensics (CSFC)": {
+  "version": "CSFC 4-Year Plan Version 7.7 (Fall 2023, Standard)",
+  "total_credit_hours": 132,
+  "levels": {
+    "1": [
+      { "course_code": "MATH101", "title": "Calculus I", "credits": 4, "prerequisite": "MATH002", "type": "Department", "requirement": "Required" },
+      { "course_code": "ENGL101", "title": "First Year Composition", "credits": 3, "prerequisite": "ENGL005", "type": "Institution", "requirement": "Required" },
+      { "course_code": "GIAS101", "title": "Islamic Culture", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required" },
+      { "course_code": "GHALxxx", "title": "Humanities, Arts and Languages Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective" },
+      { "course_code": "CS111", "title": "Introduction to Computing and Programming", "credits": 4, "prerequisite": "PCS001", "type": "College", "requirement": "Required" }
+    ],
+    "2": [
+      { "course_code": "MATH102", "title": "Calculus II", "credits": 4, "prerequisite": "MATH101", "type": "Department", "requirement": "Required" },
+      { "course_code": "ENGL102", "title": "Introduction to Report Writing", "credits": 3, "prerequisite": "ENGL101", "type": "Institution", "requirement": "Required" },
+      { "course_code": "CS232", "title": "Computer Networks", "credits": 4, "prerequisite": "CS111", "type": "College", "requirement": "Required" },
+      { "course_code": "CS112", "title": "Object Oriented Programming", "credits": 4, "prerequisite": "CS111", "type": "College", "requirement": "Required" },
+      { "course_code": "FC112", "title": "Introduction to Cyber Security", "credits": 3, "prerequisite": "CS232", "type": "Department", "requirement": "Required" }
+    ],
+    "3": [
+      { "course_code": "ENGL201", "title": "Technical Writing", "credits": 3, "prerequisite": "ENGL102", "type": "Institution", "requirement": "Required" },
+      { "course_code": "CS201", "title": "Introduction to Discrete Systems", "credits": 3, "prerequisite": "MATH102", "type": "College", "requirement": "Required" },
+      { "course_code": "CS221", "title": "Fundamentals of Operating Systems", "credits": 4, "prerequisite": "CS112", "type": "College", "requirement": "Required" },
+      { "course_code": "CS211", "title": "Data Structures and Algorithms", "credits": 4, "prerequisite": "CS112", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC281", "title": "Offensive Security and Ethical Hacking", "credits": 4, "prerequisite": "CS232, FC112", "type": "Department", "requirement": "Required" }
+    ],
+    "4": [
+      { "course_code": "STAT232", "title": "Probability and Statistics", "credits": 3, "prerequisite": "MATH102", "type": "Department", "requirement": "Required" },
+      { "course_code": "SE262", "title": "Software Engineering", "credits": 3, "prerequisite": "CS112", "type": "Department", "requirement": "Required" },
+      { "course_code": "CS224", "title": "Computer Architecture and Organization", "credits": 3, "prerequisite": "CS111", "type": "College", "requirement": "Required" },
+      { "course_code": "FC254", "title": "Operating System Hardening", "credits": 3, "prerequisite": "CS221, FC112", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC382", "title": "Defence Mechanisms", "credits": 3, "prerequisite": "CS232, SE262, FC254", "type": "Department", "requirement": "Required" }
+    ],
+    "5": [
+      { "course_code": "CS317", "title": "Web Application Development", "credits": 3, "prerequisite": "CS211, CS351", "type": "Department", "requirement": "Required" },
+      { "course_code": "CS351", "title": "Fundamentals of Database Systems", "credits": 4, "prerequisite": "CS112", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC331", "title": "Software Security", "credits": 3, "prerequisite": "CS232, SE262, FC254", "type": "Department", "requirement": "Required" },
+      { "course_code": "AI381", "title": "Artificial Intelligence I", "credits": 3, "prerequisite": "CS112", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC383", "title": "Advanced Secure Network Design", "credits": 3, "prerequisite": "FC382, FC331", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC315", "title": "Ethics and Professionalism in Cyber Security", "credits": 2, "prerequisite": "FC112, GIAS101", "type": "Department", "requirement": "Required" }
+    ],
+    "6": [
+      { "course_code": "GIAS102", "title": "Arabic Language Skills", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Required" },
+      { "course_code": "FC302", "title": "Introduction to Digital Forensics", "credits": 4, "prerequisite": "FC382", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC312", "title": "Web Application Security", "credits": 4, "prerequisite": "CS317, FC331", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC362", "title": "Cyber Security Risk Management", "credits": 3, "prerequisite": "SE262, FC382, FC315", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC322", "title": "Advanced Cryptography", "credits": 3, "prerequisite": "CS201, FC382", "type": "Department", "requirement": "Required" }
+    ],
+    "7": [
+      { "course_code": "FC394", "title": "Summer Practical Training", "credits": 1, "prerequisite": "Year 3 Core Courses", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC491", "title": "Capstone Project I", "credits": 3, "prerequisite": "College Approval", "type": "Department", "requirement": "Required" },
+      { "course_code": "GSOSxxx", "title": "Social Sciences Elective", "credits": 3, "prerequisite": "-", "type": "Institution", "requirement": "Elective" },
+      { "course_code": "FC403", "title": "Advanced Digital Forensics", "credits": 4, "prerequisite": "FC302", "type": "Department", "requirement": "Required" },
+      { "course_code": "FC407", "title": "Security and Privacy Standards and Policies", "credits": 3, "prerequisite": "FC112", "type": "Department", "requirement": "Required" },
+      { "course_code": "FCxxx", "title": "Professional Elective I", "credits": 3, "prerequisite": "College Approval", "type": "Department", "requirement": "Elective" },
+      { "course_code": "FCxxx", "title": "Professional Elective II", "credits": 3, "prerequisite": "College Approval", "type": "Department", "requirement": "Elective" }
+    ],
+    "8": [
+      { "course_code": "FC492", "title": "Capstone Project II", "credits": 3, "prerequisite": "FC491", "type": "Department", "requirement": "Required" },
+      { "course_code": "C3Sxxx", "title": "College Elective I", "credits": 3, "prerequisite": "College Approval", "type": "College", "requirement": "Elective" },
+      { "course_code": "C3Sxxx", "title": "College Elective II", "credits": 3, "prerequisite": "College Approval", "type": "College", "requirement": "Elective" },
+      { "course_code": "FCxxx", "title": "Professional Elective III", "credits": 3, "prerequisite": "College Approval", "type": "Department", "requirement": "Elective" },
+      { "course_code": "FCxxx", "title": "Professional Elective IV", "credits": 3, "prerequisite": "College Approval", "type": "Department", "requirement": "Elective" }
+    ]
+  }
+    },
+
     "BS Software Engineering": {
       "version": "ABET September 2024",
       "total_credit_hours": 132,
@@ -68,6 +2756,7 @@
         ]
       }
     },
+
     "BS in Artificial Intelligence and Data Science": {
       "version": "Updated 2025 V3",
       "total_credit_hours": 132,
@@ -154,7 +2843,6 @@
           "specific": ["GSOS214"]
         }
       }
-
     }
   }
 }

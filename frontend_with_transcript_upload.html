@@ -593,34 +593,10 @@ if(res.ok){
   localStorage.setItem("transcriptReady", "true")
   localStorage.setItem("subsystemData", JSON.stringify(data))
 
-  addBotMessage(data.message || "Transcript and study plan analyzed successfully.")
-
-  if (data.summary) {
-    const summary = data.summary
-    addBotMessage(
-      "Summary:\n" +
-      `Completed Credits: ${summary.credits_completed ?? 0}\n` +
-      `In Progress Credits: ${summary.credits_in_progress ?? 0}\n` +
-      `Remaining Credits: ${summary.credits_remaining ?? 0}\n` +
-      `Completion: ${summary.completion_percentage ?? 0}%`
-    )
-  }
-
-  if (Array.isArray(data.advice) && data.advice.length) {
-    addBotMessage("Personalized Advice:\n" + data.advice.join("\n"))
-  }
-
-  if (Array.isArray(data.eligible_next_semester) && data.eligible_next_semester.length) {
-    addBotMessage(
-      "Eligible Next Semester:\n" +
-      data.eligible_next_semester
-        .map(item => `${item.course_code} - ${item.course_name}`)
-        .join("\n")
-    )
-  }
+  addBotMessage("Analysis completed. Download your files below.")
 
   if (data.excel_file) {
-    addBotMessage("Download your study plan report:\n" + SUBSYSTEM_URL + data.excel_file)
+    addBotMessage("Download Audit Excel:\n" + SUBSYSTEM_URL + data.excel_file)
   }
 
   if (data.download_structured_excel_url) {

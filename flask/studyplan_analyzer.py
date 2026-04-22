@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import json
 import os
 import re
@@ -13,6 +14,7 @@ from xml.etree import ElementTree as ET
 
 import pandas as pd
 import pdfplumber
+import requests
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 
@@ -167,6 +169,116 @@ def detect_study_plan_file_type(file_path: str) -> str:
     if ext in IMAGE_EXTENSIONS:
         return "image"
     return "unknown"
+
+
+def _gemini_api_url(model: str, api_key: str) -> str:
+    return f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+
+
+def _mime_type_for_file(file_path: str, file_type: str) -> str:
+    ext = os.path.splitext(file_path)[1].lower()
+    if file_type == "pdf":
+        return "application/pdf"
+    if file_type == "docx":
+        return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    if file_type == "txt":
+        return "text/plain"
+    if file_type == "image":
+        return {
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".bmp": "image/bmp",
+            ".tif": "image/tiff",
+            ".tiff": "image/tiff",
+            ".webp": "image/webp",
+        }.get(ext, "application/octet-stream")
+    return "application/octet-stream"
+
+
+def _extract_gemini_text(data: dict) -> str:
+    candidates = data.get("candidates") or []
+    for candidate in candidates:
+        content = candidate.get("content") or {}
+        for part in content.get("parts") or []:
+            text = (part.get("text") or "").strip()
+            if text:
+                return text
+    return ""
+
+
+def extract_study_plan_with_gemini(file_path: str, program_hint: str | None = None) -> dict[str, Any] | None:
+    api_key = (os.environ.get("GEMINI_API_KEY") or "").strip()
+    model = (os.environ.get("GEMINI_MODEL") or "gemini-2.5-flash").strip()
+    file_type = detect_study_plan_file_type(file_path)
+
+    if not api_key or file_type not in {"pdf", "docx", "txt", "image"}:
+        return None
+
+    try:
+        with open(file_path, "rb") as fh:
+            file_bytes = fh.read()
+    except OSError:
+        return None
+
+    prompt = (
+        "Extract the uploaded study plan into strict JSON only. "
+        "Return no markdown and no commentary. "
+        "Use this exact schema: "
+        '{"program_name":"","catalog_year":"","courses":[{"course_code":"","course_name":"","credit_hours":null,"prerequisites":[],"year_no":null,"semester_no":null,"category":""}],"slot_rules":{}}. '
+        "Each course must be one record only. "
+        "Do not merge neighboring rows. "
+        "If a field is unclear, use null or an empty string. "
+        f"Program hint: {program_hint or ''}"
+    )
+
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": prompt},
+                    {
+                        "inline_data": {
+                            "mime_type": _mime_type_for_file(file_path, file_type),
+                            "data": base64.b64encode(file_bytes).decode("ascii"),
+                        }
+                    },
+                ]
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.0,
+            "topP": 0.9,
+            "maxOutputTokens": 4096,
+            "response_mime_type": "application/json",
+        },
+    }
+
+    try:
+        response = requests.post(
+            _gemini_api_url(model, api_key),
+            json=payload,
+            timeout=90,
+        )
+        if response.status_code != 200:
+            return None
+        data = response.json()
+        text = _extract_gemini_text(data)
+        if not text:
+            return None
+        parsed = json.loads(text)
+        courses = _normalize_plan_rows(parsed.get("courses", []), source=f"study_plan_gemini:{file_type}", allow_name_only=True)
+        if not courses:
+            return None
+        return {
+            "program_name": str(parsed.get("program_name") or program_hint or "").strip(),
+            "catalog_year": str(parsed.get("catalog_year") or "").strip(),
+            "courses": courses,
+            "slot_rules": parsed.get("slot_rules") or {},
+            "source_type": f"gemini_{file_type}",
+        }
+    except (requests.exceptions.RequestException, ValueError, TypeError, json.JSONDecodeError):
+        return None
 
 
 def _extract_docx_text(file_path: str) -> str:
@@ -409,6 +521,9 @@ def extract_study_plan_data(file_path: str, program_hint: str | None = None) -> 
     file_type = detect_study_plan_file_type(file_path)
 
     if file_type == "pdf":
+        gemini_plan = extract_study_plan_with_gemini(file_path, program_hint=program_hint)
+        if gemini_plan and gemini_plan.get("courses"):
+            return gemini_plan
         table_rows = _parse_pdf_table_rows(file_path)
         normalized_table_rows = _normalize_plan_rows(table_rows, source="study_plan_pdf_table", allow_name_only=False)
         text_rows = _parse_study_plan_text(extract_text(file_path), "pdf", program_hint=program_hint)
@@ -420,8 +535,14 @@ def extract_study_plan_data(file_path: str, program_hint: str | None = None) -> 
             "source_type": "pdf",
         }
     elif file_type == "docx":
+        gemini_plan = extract_study_plan_with_gemini(file_path, program_hint=program_hint)
+        if gemini_plan and gemini_plan.get("courses"):
+            return gemini_plan
         plan = _parse_study_plan_text(_extract_docx_text(file_path), "docx", program_hint=program_hint)
     elif file_type == "txt":
+        gemini_plan = extract_study_plan_with_gemini(file_path, program_hint=program_hint)
+        if gemini_plan and gemini_plan.get("courses"):
+            return gemini_plan
         plan = _parse_study_plan_text(_extract_plain_text(file_path), "txt", program_hint=program_hint)
     elif file_type == "xlsx":
         excel_book = pd.read_excel(file_path, sheet_name=None)
@@ -448,6 +569,9 @@ def extract_study_plan_data(file_path: str, program_hint: str | None = None) -> 
             "source_type": "csv",
         }
     elif file_type == "image":
+        gemini_plan = extract_study_plan_with_gemini(file_path, program_hint=program_hint)
+        if gemini_plan and gemini_plan.get("courses"):
+            return gemini_plan
         plan = {
             "program_name": program_hint or "",
             "catalog_year": "",

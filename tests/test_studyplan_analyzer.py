@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import unittest
+from unittest.mock import patch
 
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -19,6 +20,7 @@ from studyplan_analyzer import (
     analyze_transcript_and_study_plan_data,
     build_study_plan_audit_workbook,
     detect_study_plan_file_type,
+    extract_study_plan_data,
 )
 
 
@@ -121,6 +123,29 @@ class StudyPlanAnalyzerTests(unittest.TestCase):
         self.assertEqual(rows["CS102"]["prerequisites"], ["CS101"])
         self.assertEqual(rows["CS102"]["credit_hours"], 3.0)
         self.assertEqual(rows["CS103"]["semester_no"], 2)
+
+    def test_gemini_study_plan_success_short_circuits_fallback(self):
+        gemini_plan = {
+            "program_name": "BS Test Program",
+            "catalog_year": "2025",
+            "courses": [PLAN_DATA["courses"][0]],
+            "slot_rules": {},
+            "source_type": "gemini_pdf",
+        }
+        with patch("studyplan_analyzer.detect_study_plan_file_type", return_value="pdf"), \
+             patch("studyplan_analyzer.extract_study_plan_with_gemini", return_value=gemini_plan), \
+             patch("studyplan_analyzer._parse_pdf_table_rows") as mock_pdf_tables:
+            plan = extract_study_plan_data("dummy.pdf", program_hint="BS Test Program")
+        self.assertEqual(plan["source_type"], "gemini_pdf")
+        mock_pdf_tables.assert_not_called()
+
+    def test_gemini_study_plan_failure_falls_back_to_parser(self):
+        with patch("studyplan_analyzer.detect_study_plan_file_type", return_value="txt"), \
+             patch("studyplan_analyzer.extract_study_plan_with_gemini", return_value=None), \
+             patch("studyplan_analyzer._extract_plain_text", return_value="CS101 Intro Programming 3"):
+            plan = extract_study_plan_data("dummy.txt", program_hint="BS Test Program")
+        self.assertEqual(plan["source_type"], "txt")
+        self.assertEqual(plan["courses"][0]["course_code"], "CS101")
 
     def test_status_assignment_and_summary(self):
         result = analyze_transcript_and_study_plan_data(TRANSCRIPT_DATA, PLAN_DATA)

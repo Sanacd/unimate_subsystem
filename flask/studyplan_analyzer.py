@@ -1139,21 +1139,54 @@ def analyze_transcript_and_study_plan_data(
         "structured_excel_path": structured_excel_path,
         "structured_excel_filename": structured_excel_filename,
     }
-def analyze_transcript_and_study_plan(
-    transcript_file_path: str,
-    study_plan_file_path: str,
-    program_hint: str | None = None,
-    use_model_comparison: bool = True,
-    output_dir: str | None = None,
-    transcript_path: str | None = None,
-    study_plan_path: str | None = None,
-) -> dict[str, Any]:
+def analyze_transcript_and_study_plan(*args: Any, **kwargs: Any) -> dict[str, Any]:
+    """
+    Full pipeline:
+    - extract transcript
+    - extract study plan
+    - compare them
+    - generate Excel outputs
+
+    Supports both:
+    - transcript_file_path / study_plan_file_path
+    - transcript_path / study_plan_path
+    """
+
     from pdf_extractor import extract_transcript_data
+    import os
+    import uuid
+
+    transcript_file_path = kwargs.pop("transcript_file_path", None)
+    study_plan_file_path = kwargs.pop("study_plan_file_path", None)
+    program_hint = kwargs.pop("program_hint", None)
+    use_model_comparison = kwargs.pop("use_model_comparison", True)
+    output_dir = kwargs.pop("output_dir", None)
+    transcript_path = kwargs.pop("transcript_path", None)
+    study_plan_path = kwargs.pop("study_plan_path", None)
+
+    if len(args) >= 1 and transcript_file_path is None:
+        transcript_file_path = args[0]
+    if len(args) >= 2 and study_plan_file_path is None:
+        study_plan_file_path = args[1]
+    if len(args) >= 3 and program_hint is None:
+        program_hint = args[2]
+    if len(args) >= 4:
+        use_model_comparison = args[3]
+    if len(args) >= 5 and output_dir is None:
+        output_dir = args[4]
+    if len(args) > 5:
+        raise TypeError("analyze_transcript_and_study_plan() accepts at most 5 positional arguments.")
+    if kwargs:
+        unexpected = ", ".join(sorted(kwargs.keys()))
+        raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
 
     transcript_file_path = transcript_file_path or transcript_path
     study_plan_file_path = study_plan_file_path or study_plan_path
-    if not transcript_file_path or not study_plan_file_path:
-        raise ValueError("Both transcript and study plan files are required.")
+
+    if not transcript_file_path:
+        raise ValueError("transcript_file_path is required.")
+    if not study_plan_file_path:
+        raise ValueError("study_plan_file_path is required.")
 
     print("[1/4] Extracting transcript data...")
     transcript_data = extract_transcript_data(transcript_file_path)
@@ -1172,11 +1205,32 @@ def analyze_transcript_and_study_plan(
     )
     print("[3/4] Done.")
 
-    print("[4/4] Finalizing result...")
-    print("[4/4] Done.")
+    if output_dir is None:
+        output_dir = os.path.join(os.path.dirname(__file__), "uploads")
+    os.makedirs(output_dir, exist_ok=True)
+
+    # audit excel
+    audit_filename = f"study_plan_audit_{uuid.uuid4().hex}.xlsx"
+    audit_path = os.path.join(output_dir, audit_filename)
+    _build_audit_workbook(result["merged_rows"], audit_path)
+
+    # structured excel
+    structured_filename = f"structured_study_plan_{uuid.uuid4().hex}.xlsx"
+    structured_path = os.path.join(output_dir, structured_filename)
+
+    build_structured_study_plan_workbook(
+        merged_rows=result["merged_rows"],
+        output_path=structured_path,
+        program_name=result.get("study_plan_meta", {}).get("program_name", "Study Plan"),
+        total_required_credits=_infer_total_required_credits(result["merged_rows"], fallback=132),
+    )
+
+    result["excel_path"] = audit_path
+    result["excel_filename"] = audit_filename
+    result["structured_excel_path"] = structured_path
+    result["structured_excel_filename"] = structured_filename
 
     return result
-
 # =========================
 # CLI usage
 # =========================

@@ -158,12 +158,15 @@ debug_log(f"UPLOAD_FOLDER: {UPLOAD_FOLDER}")
 # --------------------------------------------------------------------
 # ✅ Routes to serve UI
 # --------------------------------------------------------------------
-@app.route("/")
-def serve_index():
-    index_file = os.path.join(FRONTEND_DIR, "index.html")
-    if os.path.exists(index_file):
-        return send_from_directory(FRONTEND_DIR, "index.html")
-    return "<h3>❌ index.html not found in /frontend</h3>", 404
+@app.route("/", methods=["GET"])
+def serve_frontend():
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    frontend_path = os.path.join(project_root, "frontend_with_transcript_upload.html")
+
+    if not os.path.exists(frontend_path):
+        return f"❌ frontend_with_transcript_upload.html not found at {frontend_path}", 404
+
+    return send_file(frontend_path)
 
 @app.route("/static/<path:filename>")
 def serve_static_folder(filename):
@@ -821,7 +824,11 @@ import pandas as pd
 from agents_runtime import _save_state
 from pdf_extractor import extract_text, clean_text, parse_courses_with_multiline_fix, extract_gpa_summary_v3
 from shared_tools import compare_transcript_with_plan
-from studyplan_analyzer import analyze_transcript_and_study_plan
+def _get_studyplan_analyzer():
+    import importlib
+    import studyplan_analyzer
+
+    return importlib.reload(studyplan_analyzer)
 
 
 def _save_named_upload(file_storage, label: str) -> str:
@@ -944,9 +951,10 @@ def analyze_study_plan():
     study_plan_path = _save_named_upload(study_plan_file, "study_plan")
 
     try:
-        artifacts = analyze_transcript_and_study_plan(
-            transcript_path=transcript_path,
-            study_plan_path=study_plan_path,
+        analyzer = _get_studyplan_analyzer()
+        artifacts = analyzer.analyze_transcript_and_study_plan(
+            transcript_file_path=transcript_path,
+            study_plan_file_path=study_plan_path,
             output_dir=UPLOAD_FOLDER,
         )
     except ValueError as exc:

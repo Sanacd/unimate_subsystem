@@ -122,12 +122,27 @@ sys.modules["app"] = app_shim
 
 from agents_runtime import StudentState, load_student_state, save_student_state, ui_agent_handle_upload
 from shared_tools import build_chat_fallback, generate_llm_response
-from studyplan_analyzer import analyze_transcript_and_study_plan
+def _get_studyplan_analyzer():
+    import importlib
+    import studyplan_analyzer
+
+    return importlib.reload(studyplan_analyzer)
 
 with open(os.path.join(LEGACY_DIR, "academic_policy.json"), "r", encoding="utf-8") as f:
     ACADEMIC_POLICY = json.load(f)
 
 app = Flask(__name__, static_folder=None)
+
+
+@app.route("/", methods=["GET"])
+def serve_frontend():
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    frontend_path = os.path.join(project_root, "frontend_with_transcript_upload.html")
+
+    if not os.path.exists(frontend_path):
+        return f"❌ frontend_with_transcript_upload.html not found at {frontend_path}", 404
+
+    return send_file(frontend_path)
 
 FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "").strip()
 COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "false").lower() == "true"
@@ -300,9 +315,10 @@ def api_analyze_study_plan():
     study_plan_path = _save_uploaded_file(study_plan_file, "study_plan")
 
     try:
-        artifacts = analyze_transcript_and_study_plan(
-            transcript_path=transcript_path,
-            study_plan_path=study_plan_path,
+        analyzer = _get_studyplan_analyzer()
+        artifacts = analyzer.analyze_transcript_and_study_plan(
+            transcript_file_path=transcript_path,
+            study_plan_file_path=study_plan_path,
             output_dir=UPLOAD_FOLDER,
         )
     except ValueError as exc:

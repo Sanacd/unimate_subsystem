@@ -623,6 +623,13 @@ if(res.ok){
     addBotMessage("Download your study plan report:\n" + SUBSYSTEM_URL + data.excel_file)
   }
 
+  if (data.download_structured_excel_url) {
+    addBotMessage(
+      "Download Structured Study Plan Excel:\n" +
+      SUBSYSTEM_URL + data.download_structured_excel_url
+    )
+  }
+
   transcriptFile.value = ""
   studyPlanFile.value = ""
   updateFileStatus()

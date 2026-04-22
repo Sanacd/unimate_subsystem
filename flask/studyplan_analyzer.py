@@ -1,236 +1,469 @@
 from __future__ import annotations
 
 import base64
+import csv
 import json
+import mimetypes
 import os
 import re
 import uuid
-import zipfile
-from collections import defaultdict
-from dataclasses import dataclass
-from functools import lru_cache
-from typing import Any
-from xml.etree import ElementTree as ET
+from dataclasses import dataclass, asdict
+from pathlib import Path
+from typing import Any, Iterable
 
-import pandas as pd
-import pdfplumber
 import requests
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill
+from openpyxl.styles import Font
 
-from course_normalizer import (
-    normalize_course_code,
-    normalize_course_name,
-    normalize_course_name_key,
-    normalize_course_record,
-    normalize_credit_hours,
-    normalize_integer,
-    normalize_prerequisites,
-    record_match_key,
-)
-from pdf_extractor import extract_text, extract_transcript_data
+try:
+    from pypdf import PdfReader
+except Exception:
+    PdfReader = None
+
+try:
+    from docx import Document
+except Exception:
+    Document = None
+
+try:
+    from openpyxl import load_workbook
+except Exception:
+    load_workbook = None
+
+from excel_layout_builder import build_structured_study_plan_workbook
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".webp"}
-YEAR_WORDS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5}
-STATUS_LABELS = {
-    "completed": "Completed",
-    "in_progress": "In Progress",
-    "not_taken": "Not Taken",
-    "failed": "Failed / Retake Required",
-    "blocked": "Blocked by prerequisite",
-    "exempt": "Exempt / Transfer",
+# =========================
+# Configuration
+# =========================
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_TIMEOUT = int(os.getenv("GEMINI_TIMEOUT", "120"))
+
+SUPPORTED_EXTENSIONS = {
+    ".pdf",
+    ".docx",
+    ".txt",
+    ".json",
+    ".csv",
+    ".xlsx",
+    ".xls",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp",
 }
-STATUS_FILLS = {
-    "completed": "C6EFCE",
-    "in_progress": "FFF2CC",
-    "not_taken": "D9D9D9",
-    "failed": "F4CCCC",
-    "blocked": "FCE5CD",
-    "exempt": "D9EAD3",
-}
-TERM_ORDER = {"spring": 1, "summer": 2, "fall": 3}
-COURSE_CODE_RE = re.compile(r"[A-Z]{2,6}\s*[-]?\s*(?:\d{3}[A-Z]?|X{2,4})", re.I)
 
+
+# =========================
+# Data model
+# =========================
 
 @dataclass
-class AnalysisArtifacts:
-    student: dict[str, Any]
-    summary: dict[str, Any]
-    eligible_next_semester: list[dict[str, Any]]
-    advice: list[str]
-    preview_rows: list[dict[str, Any]]
-    excel_path: str
+class CourseRecord:
+    course_code: str = ""
+    course_name: str = ""
+    credit_hours: int | None = None
+    prerequisites: list[str] | list[dict[str, Any]] | None = None
+    year_no: int | None = None
+    semester_no: int | None = None
+    category: str = ""
+    notes: str = ""
+
+    def __post_init__(self) -> None:
+        if self.prerequisites is None:
+            self.prerequisites = []
 
 
-@lru_cache(maxsize=1)
-def load_catalog_study_plans() -> dict[str, Any]:
-    with open(os.path.join(BASE_DIR, "university_studyplans.json"), "r", encoding="utf-8") as fh:
-        data = json.load(fh)
-    return data.get("programs", data)
+# =========================
+# Normalization helpers
+# =========================
+
+COURSE_CODE_RE = re.compile(r"\b([A-Z]{2,6}\s*[-_]?\s*\d{2,4}[A-Z]?)\b", re.IGNORECASE)
+PLACEHOLDER_CODE_RE = re.compile(r"\b([A-Z]{2,8}X{2,6})\b", re.IGNORECASE)
 
 
-@lru_cache(maxsize=1)
-def load_academic_policy() -> dict[str, Any]:
-    with open(os.path.join(BASE_DIR, "academic_policy.json"), "r", encoding="utf-8") as fh:
-        return json.load(fh)
+def normalize_space(text: Any) -> str:
+    if text is None:
+        return ""
+    return re.sub(r"\s+", " ", str(text)).strip()
 
 
-def normalize_term(term: Any) -> str:
-    return re.sub(r"\s+", " ", str(term or "").strip())
+def normalize_course_code(value: Any) -> str:
+    text = normalize_space(value).upper().replace("_", "").replace("-", "").replace(" ", "")
+    if not text:
+        return ""
 
+    placeholder_match = PLACEHOLDER_CODE_RE.search(text)
+    if placeholder_match:
+        return placeholder_match.group(1).upper()
 
-def classify_transcript_status(grade: Any, points: Any) -> str:
-    grade_text = str(grade or "").strip().upper()
-    if grade_text in {"WAIVED", "WAIVE", "TR", "TRANSFER"}:
-        return "exempt"
-    if grade_text in {"IP", "I", "IN PROGRESS", "INPROGRESS"}:
-        return "in_progress"
-    if grade_text in {"F", "FA", "NF"}:
-        return "failed"
-    if grade_text in {"W", "WF", "WP", "WITHDRAWN"}:
-        return "not_taken"
-    try:
-        if float(points or 0) > 0:
-            return "completed"
-    except (TypeError, ValueError):
-        pass
-    if grade_text and grade_text not in {"0", "0.0", "0.00"}:
-        return "completed"
-    return "in_progress"
+    code_match = re.search(r"([A-Z]{2,6}\d{2,4}[A-Z]?)", text)
+    if code_match:
+        return code_match.group(1).upper()
 
-
-def _term_sort_key(term: str) -> tuple[int, int, str]:
-    match = re.search(r"(20\d{2})", term or "")
-    year = int(match.group(1)) if match else 0
-    lowered = (term or "").lower()
-    season_rank = 0
-    for name, rank in TERM_ORDER.items():
-        if name in lowered:
-            season_rank = rank
-            break
-    return (year, season_rank, lowered)
-
-
-def _status_rank(status: str) -> int:
-    return {
-        "completed": 5,
-        "exempt": 4,
-        "in_progress": 3,
-        "failed": 2,
-        "not_taken": 1,
-    }.get(status, 0)
-
-
-def _attempt_sort_key(attempt: dict[str, Any]) -> tuple[int, int, int, str]:
-    year, season, lowered = _term_sort_key(attempt.get("term_taken", ""))
-    return (_status_rank(attempt.get("status", "")), year, season, lowered)
-
-
-def _catalog_program_from_hint(program_hint: str | None) -> tuple[str | None, dict[str, Any] | None]:
-    if not program_hint:
-        return None, None
-
-    normalized_hint = normalize_course_name_key(program_hint)
-    programs = load_catalog_study_plans()
-
-    for key, value in programs.items():
-        if normalize_course_name_key(key) == normalized_hint:
-            return key, value
-    for key, value in programs.items():
-        if normalized_hint and normalized_hint in normalize_course_name_key(key):
-            return key, value
-    return None, None
-
-
-def _infer_year_semester_from_level(level_value: Any) -> tuple[int | None, int | None]:
-    level_num = normalize_integer(level_value)
-    if level_num is None:
-        return None, None
-    year_no = ((level_num - 1) // 2) + 1
-    semester_no = 1 if level_num % 2 else 2
-    return year_no, semester_no
-
-
-def detect_study_plan_file_type(file_path: str) -> str:
-    ext = os.path.splitext(file_path)[1].lower()
-    mapping = {
-        ".pdf": "pdf",
-        ".docx": "docx",
-        ".txt": "txt",
-        ".json": "json",
-        ".csv": "csv",
-        ".xlsx": "xlsx",
-        ".xls": "xlsx",
-    }
-    if ext in mapping:
-        return mapping[ext]
-    if ext in IMAGE_EXTENSIONS:
-        return "image"
-    return "unknown"
-
-
-def _gemini_api_url(model: str, api_key: str) -> str:
-    return f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-
-
-def _mime_type_for_file(file_path: str, file_type: str) -> str:
-    ext = os.path.splitext(file_path)[1].lower()
-    if file_type == "pdf":
-        return "application/pdf"
-    if file_type == "docx":
-        return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    if file_type == "txt":
-        return "text/plain"
-    if file_type == "image":
-        return {
-            ".png": "image/png",
-            ".jpg": "image/jpeg",
-            ".jpeg": "image/jpeg",
-            ".bmp": "image/bmp",
-            ".tif": "image/tiff",
-            ".tiff": "image/tiff",
-            ".webp": "image/webp",
-        }.get(ext, "application/octet-stream")
-    return "application/octet-stream"
-
-
-def _extract_gemini_text(data: dict) -> str:
-    candidates = data.get("candidates") or []
-    for candidate in candidates:
-        content = candidate.get("content") or {}
-        for part in content.get("parts") or []:
-            text = (part.get("text") or "").strip()
-            if text:
-                return text
     return ""
 
 
-def extract_study_plan_with_gemini(file_path: str, program_hint: str | None = None) -> dict[str, Any] | None:
-    api_key = (os.environ.get("GEMINI_API_KEY") or "").strip()
-    model = (os.environ.get("GEMINI_MODEL") or "gemini-2.5-flash").strip()
-    file_type = detect_study_plan_file_type(file_path)
+def normalize_course_name(value: Any) -> str:
+    text = normalize_space(value)
+    if not text:
+        return ""
 
-    if not api_key or file_type not in {"pdf", "docx", "txt", "image"}:
+    text = re.sub(r"\b(pre[- ]?reqs?|prerequisites?)\b.*$", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\b(co[- ]?reqs?|corequisites?)\b.*$", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bcredits?\b.*$", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"^\s*[A-Z]{2,6}\s*[-_]?\s*\d{2,4}[A-Z]?\s*", "", text, flags=re.IGNORECASE)
+
+    return normalize_space(text)
+
+
+def normalize_credit_hours(value: Any) -> int | None:
+    if value is None:
+        return None
+
+    if isinstance(value, (int, float)):
+        ivalue = int(value)
+        return ivalue if 0 <= ivalue <= 10 else None
+
+    text = normalize_space(value)
+    if not text:
+        return None
+
+    match = re.search(r"\b(\d+(?:\.\d+)?)\b", text)
+    if not match:
         return None
 
     try:
-        with open(file_path, "rb") as fh:
-            file_bytes = fh.read()
-    except OSError:
+        ivalue = int(float(match.group(1)))
+    except ValueError:
         return None
 
-    prompt = (
-        "Extract the uploaded study plan into strict JSON only. "
-        "Return no markdown and no commentary. "
-        "Use this exact schema: "
-        '{"program_name":"","catalog_year":"","courses":[{"course_code":"","course_name":"","credit_hours":null,"prerequisites":[],"year_no":null,"semester_no":null,"category":""}],"slot_rules":{}}. '
-        "Each course must be one record only. "
-        "Do not merge neighboring rows. "
-        "If a field is unclear, use null or an empty string. "
-        f"Program hint: {program_hint or ''}"
+    return ivalue if 0 <= ivalue <= 10 else None
+
+
+def normalize_prerequisites(value: Any) -> list[str]:
+    if value is None:
+        return []
+
+    if isinstance(value, list):
+        items = value
+    else:
+        text = normalize_space(value)
+        if not text:
+            return []
+        items = re.split(r"[;,/]|(?:\band\b)|(?:\bor\b)", text, flags=re.IGNORECASE)
+
+    result: list[str] = []
+    for item in items:
+        code = normalize_course_code(item)
+        if code and code not in result:
+            result.append(code)
+    return result
+
+
+def normalize_int(value: Any) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, int):
+        return value
+    text = normalize_space(value)
+    if not text:
+        return None
+    match = re.search(r"\d+", text)
+    return int(match.group()) if match else None
+
+
+def is_reasonable_course_row(course: CourseRecord) -> bool:
+    if not course.course_code and not course.course_name:
+        return False
+    if course.credit_hours is not None and not (0 <= course.credit_hours <= 10):
+        return False
+    if len(course.course_name) > 180:
+        return False
+    return True
+
+
+def normalize_course_record(raw: dict[str, Any]) -> CourseRecord:
+    return CourseRecord(
+        course_code=normalize_course_code(raw.get("course_code") or raw.get("code")),
+        course_name=normalize_course_name(raw.get("course_name") or raw.get("name") or raw.get("title")),
+        credit_hours=normalize_credit_hours(raw.get("credit_hours") or raw.get("credits") or raw.get("credit")),
+        prerequisites=normalize_prerequisites(raw.get("prerequisites") or raw.get("prereqs") or raw.get("prerequisite")),
+        year_no=normalize_int(raw.get("year_no") or raw.get("year")),
+        semester_no=normalize_int(raw.get("semester_no") or raw.get("semester") or raw.get("term")),
+        category=normalize_space(raw.get("category")),
+        notes=normalize_space(raw.get("notes")),
     )
+
+
+# =========================
+# Generic helpers
+# =========================
+
+def _safe_str(value: Any) -> str:
+    return "" if value is None else str(value).strip()
+
+
+def _safe_int(value: Any) -> int | None:
+    if value is None or value == "":
+        return None
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return None
+
+
+# =========================
+# File type detection
+# =========================
+
+def detect_file_type(file_path: str) -> str:
+    suffix = Path(file_path).suffix.lower()
+    if suffix not in SUPPORTED_EXTENSIONS:
+        raise ValueError(f"Unsupported file type: {suffix}")
+    return suffix.lstrip(".")
+
+
+def guess_mime_type(file_path: str) -> str:
+    mime_type, _ = mimetypes.guess_type(file_path)
+    return mime_type or "application/octet-stream"
+
+
+# =========================
+# Structured file readers
+# =========================
+
+def read_text_file(file_path: str) -> str:
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        return f.read()
+
+
+def read_json_file(file_path: str) -> Any:
+    with open(file_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def read_csv_rows(file_path: str) -> list[dict[str, Any]]:
+    with open(file_path, "r", encoding="utf-8", errors="ignore", newline="") as f:
+        reader = csv.DictReader(f)
+        return [dict(row) for row in reader]
+
+
+def read_xlsx_rows(file_path: str) -> list[dict[str, Any]]:
+    if load_workbook is None:
+        raise RuntimeError("openpyxl is not installed.")
+
+    wb = load_workbook(file_path, data_only=True)
+    rows_out: list[dict[str, Any]] = []
+
+    for ws in wb.worksheets:
+        raw_rows = list(ws.iter_rows(values_only=True))
+        if not raw_rows:
+            continue
+
+        headers = [normalize_space(x) for x in raw_rows[0]]
+        if not any(headers):
+            continue
+
+        for row in raw_rows[1:]:
+            values = list(row)
+            row_dict = {}
+            for idx, header in enumerate(headers):
+                if not header:
+                    continue
+                row_dict[header] = values[idx] if idx < len(values) else None
+            if any(v not in (None, "") for v in row_dict.values()):
+                rows_out.append(row_dict)
+
+    return rows_out
+
+
+def read_docx_text(file_path: str) -> str:
+    if Document is None:
+        raise RuntimeError("python-docx is not installed.")
+
+    doc = Document(file_path)
+    parts: list[str] = []
+
+    for p in doc.paragraphs:
+        text = normalize_space(p.text)
+        if text:
+            parts.append(text)
+
+    for table in doc.tables:
+        for row in table.rows:
+            cells = [normalize_space(cell.text) for cell in row.cells if normalize_space(cell.text)]
+            if cells:
+                parts.append(" | ".join(cells))
+
+    return "\n".join(parts)
+
+
+def read_pdf_text(file_path: str) -> str:
+    if PdfReader is None:
+        raise RuntimeError("pypdf is not installed.")
+
+    reader = PdfReader(file_path)
+    parts: list[str] = []
+    for page in reader.pages:
+        text = page.extract_text() or ""
+        text = normalize_space(text)
+        if text:
+            parts.append(text)
+    return "\n".join(parts)
+
+
+# =========================
+# Local fallback parsing
+# =========================
+
+def parse_rows_from_generic_records(records: Iterable[dict[str, Any]]) -> list[CourseRecord]:
+    normalized: list[CourseRecord] = []
+    for raw in records:
+        lowered = {str(k).strip().lower(): v for k, v in raw.items()}
+
+        mapped = {
+            "course_code": lowered.get("course_code") or lowered.get("code") or lowered.get("course") or lowered.get("course id"),
+            "course_name": lowered.get("course_name") or lowered.get("name") or lowered.get("title") or lowered.get("course title"),
+            "credit_hours": lowered.get("credit_hours") or lowered.get("credits") or lowered.get("credit") or lowered.get("cr"),
+            "prerequisites": lowered.get("prerequisites") or lowered.get("prereqs") or lowered.get("prerequisite"),
+            "year_no": lowered.get("year_no") or lowered.get("year"),
+            "semester_no": lowered.get("semester_no") or lowered.get("semester") or lowered.get("term"),
+            "category": lowered.get("category") or lowered.get("type"),
+            "notes": lowered.get("notes"),
+        }
+
+        course = normalize_course_record(mapped)
+        if is_reasonable_course_row(course):
+            normalized.append(course)
+
+    return normalized
+
+
+def parse_courses_from_text(text: str) -> list[CourseRecord]:
+    lines = [normalize_space(line) for line in text.splitlines()]
+    lines = [line for line in lines if line]
+
+    courses: list[CourseRecord] = []
+
+    for line in lines:
+        code_match = COURSE_CODE_RE.search(line)
+        placeholder_match = PLACEHOLDER_CODE_RE.search(line)
+
+        code = ""
+        if code_match:
+            code = normalize_course_code(code_match.group(1))
+        elif placeholder_match:
+            code = normalize_course_code(placeholder_match.group(1))
+
+        if not code:
+            continue
+
+        credit = normalize_credit_hours(line)
+        prereqs = normalize_prerequisites(line)
+
+        name = line
+        if code:
+            name = re.sub(COURSE_CODE_RE, "", name, count=1)
+            name = re.sub(PLACEHOLDER_CODE_RE, "", name, count=1)
+
+        name = re.sub(r"\b(?:year|semester|term)\s*\d+\b", "", name, flags=re.IGNORECASE)
+        name = re.sub(r"\b\d+(?:\.\d+)?\b", "", name)
+        name = normalize_course_name(name)
+
+        course = CourseRecord(
+            course_code=code,
+            course_name=name,
+            credit_hours=credit,
+            prerequisites=prereqs,
+        )
+
+        if is_reasonable_course_row(course):
+            courses.append(course)
+
+    deduped: dict[str, CourseRecord] = {}
+    for course in courses:
+        key = course.course_code or course.course_name
+        if not key:
+            continue
+
+        current = deduped.get(key)
+        if current is None:
+            deduped[key] = course
+            continue
+
+        current_score = int(bool(current.course_name)) + int(current.credit_hours is not None) + len(current.prerequisites)
+        new_score = int(bool(course.course_name)) + int(course.credit_hours is not None) + len(course.prerequisites)
+        if new_score > current_score:
+            deduped[key] = course
+
+    return list(deduped.values())
+
+
+# =========================
+# Gemini extraction
+# =========================
+
+def gemini_prompt(program_hint: str | None = None) -> str:
+    hint = f"Program hint: {program_hint}\n" if program_hint else ""
+    return f"""
+You are a university study plan extraction engine.
+
+Read the uploaded study plan document and extract only the study plan structure.
+Return valid JSON only.
+Do not add markdown.
+Do not add explanations.
+
+{hint}
+Rules:
+1. Detect course boundaries carefully.
+2. Extract one row per course.
+3. Separate:
+   - course_code
+   - course_name
+   - credit_hours
+   - prerequisites
+   - year_no
+   - semester_no
+   - category
+4. Do not merge prerequisites or neighboring rows into course_name.
+5. If prerequisites are free-text rules, keep only real course codes in prerequisites.
+6. Preserve elective placeholders like GHALXXX, GSOSXXX, C3SXXX, AIXXX.
+7. If a field is unknown, return null or empty string/list.
+8. credit_hours must be numeric and realistic per course.
+
+Return exactly this JSON shape:
+{{
+  "program_name": "",
+  "catalog_year": "",
+  "courses": [
+    {{
+      "course_code": "",
+      "course_name": "",
+      "credit_hours": null,
+      "prerequisites": [],
+      "year_no": null,
+      "semester_no": null,
+      "category": "",
+      "notes": ""
+    }}
+  ],
+  "slot_rules": {{}}
+}}
+""".strip()
+
+import time
+
+def call_gemini_with_file(file_path: str, prompt: str, max_retries: int = 4, backoff_seconds: float = 2.0) -> dict[str, Any]:
+    if not GEMINI_API_KEY:
+        raise RuntimeError("GEMINI_API_KEY is not set.")
+
+    with open(file_path, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode("utf-8")
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
 
     payload = {
         "contents": [
@@ -239,720 +472,733 @@ def extract_study_plan_with_gemini(file_path: str, program_hint: str | None = No
                     {"text": prompt},
                     {
                         "inline_data": {
-                            "mime_type": _mime_type_for_file(file_path, file_type),
-                            "data": base64.b64encode(file_bytes).decode("ascii"),
+                            "mime_type": guess_mime_type(file_path),
+                            "data": encoded,
                         }
                     },
                 ]
             }
         ],
         "generationConfig": {
-            "temperature": 0.0,
-            "topP": 0.9,
-            "maxOutputTokens": 4096,
+            "temperature": 0,
             "response_mime_type": "application/json",
         },
     }
 
-    try:
-        response = requests.post(
-            _gemini_api_url(model, api_key),
-            json=payload,
-            timeout=90,
-        )
-        if response.status_code != 200:
-            return None
-        data = response.json()
-        text = _extract_gemini_text(data)
-        if not text:
-            return None
-        parsed = json.loads(text)
-        courses = _normalize_plan_rows(parsed.get("courses", []), source=f"study_plan_gemini:{file_type}", allow_name_only=True)
-        if not courses:
-            return None
-        return {
-            "program_name": str(parsed.get("program_name") or program_hint or "").strip(),
-            "catalog_year": str(parsed.get("catalog_year") or "").strip(),
-            "courses": courses,
-            "slot_rules": parsed.get("slot_rules") or {},
-            "source_type": f"gemini_{file_type}",
-        }
-    except (requests.exceptions.RequestException, ValueError, TypeError, json.JSONDecodeError):
-        return None
+    last_error = None
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = requests.post(url, json=payload, timeout=GEMINI_TIMEOUT)
+
+            if response.status_code in {429, 500, 502, 503, 504}:
+                raise RuntimeError(f"Gemini temporary error {response.status_code}: {response.text[:500]}")
+
+            response.raise_for_status()
+            data = response.json()
+
+            try:
+                text = data["candidates"][0]["content"]["parts"][0]["text"]
+            except (KeyError, IndexError) as exc:
+                raise RuntimeError(f"Unexpected Gemini response: {data}") from exc
+
+            try:
+                return json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(f"Gemini did not return valid JSON: {text[:1000]}") from exc
+
+        except Exception as exc:
+            last_error = exc
+            if attempt == max_retries:
+                break
+            time.sleep(backoff_seconds * attempt)
+
+    raise RuntimeError(f"Gemini file call failed after {max_retries} attempts: {last_error}")
 
 
-def _extract_docx_text(file_path: str) -> str:
-    paragraphs: list[str] = []
-    with zipfile.ZipFile(file_path) as docx_zip:
-        xml_bytes = docx_zip.read("word/document.xml")
-    root = ET.fromstring(xml_bytes)
-    namespaces = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
-    for paragraph in root.findall(".//w:p", namespaces):
-        parts = [node.text for node in paragraph.findall(".//w:t", namespaces) if node.text]
-        line = "".join(parts).strip()
-        if line:
-            paragraphs.append(line)
-    return "\n".join(paragraphs)
+import time
 
+def _call_gemini_json(prompt: str, max_retries: int = 4, backoff_seconds: float = 2.0) -> Any:
+    if not GEMINI_API_KEY:
+        raise RuntimeError("GEMINI_API_KEY is not set.")
 
-def _extract_plain_text(file_path: str) -> str:
-    with open(file_path, "r", encoding="utf-8", errors="ignore") as fh:
-        return fh.read()
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
 
-
-def _parse_year_semester_from_text(line: str) -> tuple[int | None, int | None]:
-    lowered = line.lower()
-    level_match = re.search(r"\blevel\s*(\d+)\b", lowered)
-    if level_match:
-        return _infer_year_semester_from_level(level_match.group(1))
-
-    year_no = None
-    semester_no = None
-
-    year_match = re.search(r"\b(first|second|third|fourth|fifth)\s+year\b", lowered)
-    if year_match:
-        year_no = YEAR_WORDS.get(year_match.group(1))
-
-    sem_match = re.search(r"\b(first|second)\s+semester\b", lowered)
-    if sem_match:
-        semester_no = 1 if sem_match.group(1) == "first" else 2
-
-    numeric_year_match = re.search(r"\byear\s*(\d+)\b", lowered)
-    if numeric_year_match:
-        year_no = int(numeric_year_match.group(1))
-
-    numeric_sem_match = re.search(r"\bsemester\s*(\d+)\b", lowered)
-    if numeric_sem_match:
-        semester_no = int(numeric_sem_match.group(1))
-
-    return year_no, semester_no
-
-
-def _extract_program_name(text: str, program_hint: str | None = None) -> str:
-    if program_hint:
-        return program_hint
-    for line in text.splitlines()[:20]:
-        stripped = line.strip()
-        lowered = stripped.lower()
-        if "study plan" in lowered or "curriculum" in lowered:
-            return stripped
-        if any(token in lowered for token in ("bachelor", "bs ", "program", "major")) and len(stripped) < 120:
-            return stripped
-    return ""
-
-
-def _extract_catalog_year(text: str) -> str:
-    match = re.search(r"(20\d{2}(?:\s*[-/]\s*20\d{2})?)", text)
-    return match.group(1).strip() if match else ""
-
-
-def _normalize_table_headers(values: list[Any]) -> list[str]:
-    headers = []
-    for item in values:
-        text = re.sub(r"[^a-z0-9]+", "_", str(item or "").strip().lower()).strip("_")
-        headers.append(text or "col")
-    return headers
-
-
-def _row_to_structured_dict(headers: list[str], values: list[Any]) -> dict[str, Any]:
-    row = {}
-    for index, value in enumerate(values):
-        key = headers[index] if index < len(headers) else f"col_{index}"
-        row[key] = value
-    return row
-
-
-def _looks_like_header_row(values: list[Any]) -> bool:
-    joined = " ".join(str(item or "").lower() for item in values)
-    return "course" in joined and ("credit" in joined or "hour" in joined or "code" in joined)
-
-
-def _parse_pdf_table_rows(file_path: str) -> list[dict[str, Any]]:
-    rows: list[dict[str, Any]] = []
-    with pdfplumber.open(file_path) as pdf:
-        for page in pdf.pages:
-            for table in page.extract_tables() or []:
-                cleaned = [[(cell or "").strip() for cell in raw_row] for raw_row in table if any((cell or "").strip() for cell in raw_row)]
-                if not cleaned:
-                    continue
-                header_values = cleaned[0] if _looks_like_header_row(cleaned[0]) else None
-                headers = _normalize_table_headers(header_values or [f"col_{i}" for i in range(len(cleaned[0]))])
-                data_rows = cleaned[1:] if header_values else cleaned
-                for data_row in data_rows:
-                    row_dict = _row_to_structured_dict(headers, data_row)
-                    rows.append(
-                        {
-                            "course_code": row_dict.get("course_code") or row_dict.get("code") or row_dict.get("course") or row_dict.get("col_0"),
-                            "course_name": row_dict.get("course_name") or row_dict.get("course_title") or row_dict.get("title") or row_dict.get("col_1"),
-                            "credit_hours": row_dict.get("credit_hours") or row_dict.get("credits") or row_dict.get("hours") or row_dict.get("col_2"),
-                            "prerequisites": row_dict.get("prerequisite") or row_dict.get("prerequisites"),
-                            "category": row_dict.get("category") or row_dict.get("type") or row_dict.get("requirement"),
-                            "notes": "Imported from PDF table",
-                        }
-                    )
-    return rows
-
-
-def _parse_course_line(line: str, year_no: int | None, semester_no: int | None) -> dict[str, Any] | None:
-    compact = re.sub(r"\s+", " ", line).strip(" |-")
-    if not compact:
-        return None
-
-    code_match = COURSE_CODE_RE.search(compact)
-    if not code_match:
-        return None
-
-    code = normalize_course_code(code_match.group(0))
-    remainder = compact[code_match.end():].strip(" -|")
-    if not remainder:
-        return None
-
-    prereq_match = re.search(r"\b(?:pre[- ]?req(?:uisite)?s?)\b[:\-]?\s*(.+)$", remainder, re.I)
-    prereq_text = prereq_match.group(1) if prereq_match else ""
-    working_text = remainder[:prereq_match.start()].strip(" -|,") if prereq_match else remainder
-
-    credit_hours = normalize_credit_hours(working_text)
-    if credit_hours is not None:
-        credit_match = re.search(r"(\d+(?:\.\d+)?)\s*(?:credit|credits|cr|hrs|hours)?\s*$", working_text, re.I)
-        title_part = working_text[:credit_match.start()].strip(" -|,") if credit_match else working_text
-    else:
-        title_part = working_text
-
-    return normalize_course_record(
-        {
-            "course_code": code,
-            "course_name": title_part,
-            "credit_hours": credit_hours,
-            "prerequisites": prereq_text,
-            "year_no": year_no,
-            "semester_no": semester_no,
-            "notes": "Best-effort text extraction",
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": 0,
+            "response_mime_type": "application/json",
         },
-        source="study_plan_text",
-    )
+    }
+
+    last_error = None
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = requests.post(url, json=payload, timeout=GEMINI_TIMEOUT)
+
+            if response.status_code in {429, 500, 502, 503, 504}:
+                raise RuntimeError(f"Gemini temporary error {response.status_code}: {response.text[:500]}")
+
+            response.raise_for_status()
+            data = response.json()
+
+            try:
+                text = data["candidates"][0]["content"]["parts"][0]["text"]
+            except (KeyError, IndexError) as exc:
+                raise RuntimeError(f"Unexpected Gemini response: {data}") from exc
+
+            try:
+                return json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(f"Gemini returned invalid JSON: {text[:1000]}") from exc
+
+        except Exception as exc:
+            last_error = exc
+            if attempt == max_retries:
+                break
+            time.sleep(backoff_seconds * attempt)
+
+    raise RuntimeError(f"Gemini JSON call failed after {max_retries} attempts: {last_error}")
 
 
-def _parse_study_plan_text(text: str, source_type: str, program_hint: str | None = None) -> dict[str, Any]:
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
-    courses = []
-    current_year = None
-    current_semester = None
+    
+def extract_study_plan_with_gemini(file_path: str, program_hint: str | None = None) -> dict[str, Any] | None:
+    payload = call_gemini_with_file(file_path, gemini_prompt(program_hint))
 
-    for line in lines:
-        year_no, semester_no = _parse_year_semester_from_text(line)
-        if year_no is not None:
-            current_year = year_no
-        if semester_no is not None:
-            current_semester = semester_no
+    raw_courses = payload.get("courses", [])
+    courses: list[CourseRecord] = []
 
-        record = _parse_course_line(line, current_year, current_semester)
-        if record:
-            courses.append(record)
+    for raw in raw_courses:
+        course = normalize_course_record(raw)
+        if is_reasonable_course_row(course):
+            courses.append(course)
+
+    if not courses:
+        return None
 
     return {
-        "program_name": _extract_program_name(text, program_hint=program_hint),
-        "catalog_year": _extract_catalog_year(text),
-        "courses": courses,
-        "slot_rules": {},
-        "source_type": source_type,
-        "ocr_ready": source_type == "image",
+        "program_name": normalize_space(payload.get("program_name")) or normalize_space(program_hint),
+        "catalog_year": normalize_space(payload.get("catalog_year")),
+        "courses": [asdict(course) for course in courses],
+        "slot_rules": payload.get("slot_rules", {}) or {},
+        "source_type": "gemini",
     }
 
 
-def _normalize_plan_rows(
-    rows: list[dict[str, Any]],
-    *,
-    source: str,
-    level: Any = None,
-    allow_name_only: bool = True,
-) -> list[dict[str, Any]]:
-    normalized = []
-    default_year, default_semester = _infer_year_semester_from_level(level)
-    for row in rows:
-        record = normalize_course_record(
-            row,
-            source=source,
-            default_year=default_year,
-            default_semester=default_semester,
-            allow_name_only=allow_name_only,
-        )
-        if record:
-            normalized.append(record)
-    return normalized
+# =========================
+# Study plan main public function
+# =========================
+def analyze_study_plan(file_path: str, program_hint: str | None = None) -> dict[str, Any]:
+    file_type = detect_file_type(file_path)
 
+    if file_type == "json":
+        data = read_json_file(file_path)
 
-def _normalize_program_structure(program_name: str, program_data: dict[str, Any]) -> dict[str, Any]:
-    courses = []
-    for level, rows in (program_data.get("levels") or {}).items():
-        courses.extend(_normalize_plan_rows(rows, source="study_plan_catalog", level=level, allow_name_only=True))
-
-    slot_rules = {}
-    for slot, rule in (program_data.get("slot_rules") or {}).items():
-        slot_rules[normalize_course_code(slot)] = {
-            "prefixes": [normalize_course_code(item) for item in rule.get("prefixes", []) if item],
-            "specific": [normalize_course_code(item) for item in rule.get("specific", []) if item],
-        }
-
-    return {
-        "program_name": program_name,
-        "catalog_year": str(program_data.get("version") or program_data.get("catalog_year") or "").strip(),
-        "courses": courses,
-        "slot_rules": slot_rules,
-        "source_type": "catalog",
-    }
-
-
-def _merge_plan_sources(*course_lists: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    merged: list[dict[str, Any]] = []
-    seen = set()
-    for course_list in course_lists:
-        for record in course_list:
-            key = record_match_key(record)
-            if key in seen:
-                continue
-            if not record.get("course_code") and not record.get("course_name"):
-                continue
-            seen.add(key)
-            merged.append(record)
-    return merged
-
-
-def extract_study_plan_data(file_path: str, program_hint: str | None = None) -> dict[str, Any]:
-    file_type = detect_study_plan_file_type(file_path)
-
-    if file_type == "pdf":
-        gemini_plan = extract_study_plan_with_gemini(file_path, program_hint=program_hint)
-        if gemini_plan and gemini_plan.get("courses"):
-            return gemini_plan
-        table_rows = _parse_pdf_table_rows(file_path)
-        normalized_table_rows = _normalize_plan_rows(table_rows, source="study_plan_pdf_table", allow_name_only=False)
-        text_rows = _parse_study_plan_text(extract_text(file_path), "pdf", program_hint=program_hint)
-        plan = {
-            "program_name": text_rows.get("program_name") or program_hint or "",
-            "catalog_year": text_rows.get("catalog_year") or "",
-            "courses": _merge_plan_sources(normalized_table_rows, text_rows.get("courses", [])),
-            "slot_rules": {},
-            "source_type": "pdf",
-        }
-    elif file_type == "docx":
-        gemini_plan = extract_study_plan_with_gemini(file_path, program_hint=program_hint)
-        if gemini_plan and gemini_plan.get("courses"):
-            return gemini_plan
-        plan = _parse_study_plan_text(_extract_docx_text(file_path), "docx", program_hint=program_hint)
-    elif file_type == "txt":
-        gemini_plan = extract_study_plan_with_gemini(file_path, program_hint=program_hint)
-        if gemini_plan and gemini_plan.get("courses"):
-            return gemini_plan
-        plan = _parse_study_plan_text(_extract_plain_text(file_path), "txt", program_hint=program_hint)
-    elif file_type == "xlsx":
-        excel_book = pd.read_excel(file_path, sheet_name=None)
-        structured_rows = []
-        for sheet_name, df in excel_book.items():
-            for record in _normalize_plan_rows(df.fillna("").to_dict("records"), source=f"study_plan_xlsx:{sheet_name}", allow_name_only=True):
-                if not record.get("notes"):
-                    record["notes"] = f"Imported from sheet: {sheet_name}"
-                structured_rows.append(record)
-        plan = {
-            "program_name": program_hint or "",
-            "catalog_year": "",
-            "courses": structured_rows,
-            "slot_rules": {},
-            "source_type": "xlsx",
-        }
-    elif file_type == "csv":
-        df = pd.read_csv(file_path)
-        plan = {
-            "program_name": program_hint or "",
-            "catalog_year": "",
-            "courses": _normalize_plan_rows(df.fillna("").to_dict("records"), source="study_plan_csv", allow_name_only=True),
-            "slot_rules": {},
-            "source_type": "csv",
-        }
-    elif file_type == "image":
-        gemini_plan = extract_study_plan_with_gemini(file_path, program_hint=program_hint)
-        if gemini_plan and gemini_plan.get("courses"):
-            return gemini_plan
-        plan = {
-            "program_name": program_hint or "",
-            "catalog_year": "",
-            "courses": [],
-            "slot_rules": {},
-            "source_type": "image",
-            "ocr_ready": True,
-            "notes": "Image study plan uploaded. OCR is not enabled in the current deployment.",
-        }
-    else:
-        with open(file_path, "r", encoding="utf-8") as fh:
-            raw = json.load(fh)
-
-        if isinstance(raw, dict) and "programs" in raw:
-            programs = raw["programs"]
-            selected_name, selected_program = _catalog_program_from_hint(program_hint)
-            if selected_program is None and programs:
-                first_key = next(iter(programs.keys()))
-                selected_name, selected_program = first_key, programs[first_key]
-            plan = _normalize_program_structure(selected_name or (program_hint or ""), selected_program or {})
-        elif isinstance(raw, dict) and "levels" in raw:
-            plan = _normalize_program_structure(program_hint or raw.get("program_name") or raw.get("name") or "", raw)
-        elif isinstance(raw, list):
-            plan = {
-                "program_name": program_hint or "",
-                "catalog_year": "",
-                "courses": _normalize_plan_rows(raw, source="study_plan_json_rows", allow_name_only=True),
-                "slot_rules": {},
-                "source_type": "json_rows",
+        if isinstance(data, dict) and "courses" in data:
+            raw_courses = data.get("courses", [])
+            courses = [normalize_course_record(row) for row in raw_courses]
+            courses = [c for c in courses if is_reasonable_course_row(c)]
+            return {
+                "program_name": normalize_space(data.get("program_name")) or normalize_space(program_hint),
+                "catalog_year": normalize_space(data.get("catalog_year")),
+                "courses": [asdict(c) for c in courses],
+                "slot_rules": data.get("slot_rules", {}) or {},
+                "source_type": "json",
             }
-        else:
-            plan = {
-                "program_name": raw.get("program_name") or program_hint or "",
-                "catalog_year": str(raw.get("catalog_year") or raw.get("version") or "").strip(),
-                "courses": _normalize_plan_rows(raw.get("courses", []), source="study_plan_json", allow_name_only=True),
+
+        if isinstance(data, list):
+            courses = parse_rows_from_generic_records(data)
+            return {
+                "program_name": normalize_space(program_hint),
+                "catalog_year": "",
+                "courses": [asdict(c) for c in courses],
                 "slot_rules": {},
                 "source_type": "json",
             }
 
-    if not plan.get("courses"):
-        selected_name, selected_program = _catalog_program_from_hint(program_hint)
-        if selected_program is not None:
-            fallback = _normalize_program_structure(selected_name or "", selected_program)
-            fallback["source_type"] = f"{plan.get('source_type', 'unknown')}+catalog_fallback"
-            if plan.get("ocr_ready"):
-                fallback["notes"] = plan.get("notes", "")
-            return fallback
+        raise ValueError("Unsupported JSON structure.")
 
-    return plan
+    if not GEMINI_API_KEY:
+        raise RuntimeError("GEMINI_API_KEY is not set. Gemini-only study-plan extraction cannot run.")
+
+    gemini_result = extract_study_plan_with_gemini(file_path, program_hint=program_hint)
+    if not gemini_result or not gemini_result.get("courses"):
+        raise RuntimeError("Gemini study-plan extraction returned no courses.")
+
+    return gemini_result
+# =========================
+# Comparison helpers
+# =========================
+
+def _prepare_plan_courses_for_model(plan_data: dict[str, Any]) -> list[dict[str, Any]]:
+    courses = plan_data.get("courses", []) or []
+    prepared: list[dict[str, Any]] = []
+
+    for idx, c in enumerate(courses, start=1):
+        prepared.append(
+            {
+                "plan_index": idx,
+                "course_code": normalize_course_code(c.get("course_code")),
+                "course_name": normalize_course_name(c.get("course_name")),
+                "credit_hours": _safe_int(c.get("credit_hours")),
+                "prerequisites": normalize_prerequisites(c.get("prerequisites")),
+                "year_no": _safe_int(c.get("year_no")),
+                "semester_no": _safe_int(c.get("semester_no")),
+                "category": _safe_str(c.get("category")),
+                "notes": _safe_str(c.get("notes")),
+            }
+        )
+
+    return prepared
 
 
-def _build_transcript_lookup(transcript_data: dict[str, Any]) -> dict[str, Any]:
-    by_code: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    by_name: dict[str, list[dict[str, Any]]] = defaultdict(list)
+def _prepare_transcript_courses_for_model(transcript_data: dict[str, Any]) -> list[dict[str, Any]]:
+    courses = transcript_data.get("courses", []) or []
+    prepared: list[dict[str, Any]] = []
 
-    for course in transcript_data.get("courses", []):
-        code_key, name_key = record_match_key(course)
-        if code_key:
-            by_code[code_key].append(course)
-        if name_key:
-            by_name[name_key].append(course)
+    for idx, c in enumerate(courses, start=1):
+        prepared.append(
+            {
+                "transcript_index": idx,
+                "course_code": normalize_course_code(c.get("course_code")),
+                "course_name": normalize_course_name(c.get("course_name")),
+                "credit_hours": _safe_int(c.get("credit_hours")),
+                "grade": _safe_str(c.get("grade")),
+                "status": _safe_str(c.get("status")).lower(),
+                "term_taken": _safe_str(c.get("term_taken")),
+                "notes": _safe_str(c.get("notes")),
+                "points": c.get("points", 0),
+            }
+        )
 
-    best_attempts: dict[str, dict[str, Any]] = {}
-    failed_codes = set()
-    repeated_codes = set()
+    return prepared
 
-    for code, attempts in by_code.items():
-        attempts_sorted = sorted(attempts, key=_attempt_sort_key, reverse=True)
-        best_attempts[code] = attempts_sorted[0]
-        if len(attempts) > 1:
-            repeated_codes.add(code)
-        if any(attempt.get("status") == "failed" for attempt in attempts):
-            failed_codes.add(code)
 
-    for name, attempts in by_name.items():
-        attempts_sorted = sorted(attempts, key=_attempt_sort_key, reverse=True)
-        best_attempts.setdefault(name, attempts_sorted[0])
+def _completed_transcript_codes(transcript_courses: list[dict[str, Any]]) -> set[str]:
+    completed = set()
+    for c in transcript_courses:
+        if _safe_str(c.get("status")).lower() == "completed":
+            code = normalize_course_code(c.get("course_code"))
+            if code:
+                completed.add(code)
+    return completed
+
+
+def _model_match_prompt(
+    plan_courses: list[dict[str, Any]],
+    transcript_courses: list[dict[str, Any]],
+) -> str:
+    return f"""
+You are a university academic-audit matching engine.
+
+Your task is to compare:
+1. study plan courses
+2. transcript courses
+
+and return a JSON array where EACH study plan course gets exactly one merged result row.
+
+Strict matching rules:
+1. Prefer exact course code match first.
+2. If course code is absent in the study plan row, you may use course-name similarity.
+3. Do NOT match two different study plan rows to one transcript row unless the row is an elective placeholder or generic slot.
+4. Elective placeholders like AIXXX, GHALXXX, GSOSXXX, C3SXXX are slots, not exact real transcript course codes.
+5. A transcript course with status "completed" means completed.
+6. A transcript course with status "in_progress" means in progress.
+7. If no transcript course matches, set status to "not_completed".
+8. If prerequisites are listed and the course is not completed/in progress, determine whether it is blocked:
+   - blocked = true only if at least one prerequisite course code is missing from completed transcript course codes.
+9. Do not invent courses.
+10. Return valid JSON only. No markdown. No explanation.
+
+Return exactly this array schema:
+[
+  {{
+    "plan_index": 1,
+    "study_plan_course_code": "",
+    "study_plan_course_name": "",
+    "study_plan_credit_hours": null,
+    "year_no": null,
+    "semester_no": null,
+    "category": "",
+    "prerequisites": [],
+    "matched": false,
+    "matched_transcript_index": null,
+    "matched_transcript_course_code": "",
+    "matched_transcript_course_name": "",
+    "matched_transcript_credit_hours": null,
+    "grade": "",
+    "term_taken": "",
+    "status": "not_completed",
+    "match_type": "none",
+    "blocked_by_prerequisite": false,
+    "notes": ""
+  }}
+]
+
+Allowed match_type values:
+- exact_code
+- normalized_code
+- name_similarity
+- elective_slot
+- none
+
+Study plan courses JSON:
+{json.dumps(plan_courses, ensure_ascii=False, indent=2)}
+
+Transcript courses JSON:
+{json.dumps(transcript_courses, ensure_ascii=False, indent=2)}
+""".strip()
+
+
+def _postprocess_model_merged_rows(
+    model_rows: list[dict[str, Any]],
+    plan_courses: list[dict[str, Any]],
+    transcript_courses: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    plan_index_map = {row["plan_index"]: row for row in plan_courses}
+    transcript_index_map = {row["transcript_index"]: row for row in transcript_courses}
+    completed_codes = _completed_transcript_codes(transcript_courses)
+
+    processed: list[dict[str, Any]] = []
+
+    for row in model_rows:
+        plan_index = _safe_int(row.get("plan_index"))
+        if not plan_index or plan_index not in plan_index_map:
+            continue
+
+        plan_row = plan_index_map[plan_index]
+        transcript_index = _safe_int(row.get("matched_transcript_index"))
+        transcript_row = transcript_index_map.get(transcript_index) if transcript_index else None
+
+        prerequisites = row.get("prerequisites")
+        if not isinstance(prerequisites, list):
+            prerequisites = plan_row.get("prerequisites", []) or []
+
+        blocked = bool(row.get("blocked_by_prerequisite"))
+        status = _safe_str(row.get("status")).lower() or "not_completed"
+
+        if status not in {"completed", "in_progress", "not_completed"}:
+            status = "not_completed"
+
+        if status == "not_completed":
+            prereq_codes = [normalize_course_code(p) for p in prerequisites if normalize_course_code(p)]
+            if prereq_codes:
+                blocked = any(code not in completed_codes for code in prereq_codes)
+
+        merged = {
+            "plan_index": plan_index,
+            "course_code": _safe_str(row.get("study_plan_course_code")) or plan_row.get("course_code", ""),
+            "course_name": _safe_str(row.get("study_plan_course_name")) or plan_row.get("course_name", ""),
+            "credit_hours": _safe_int(row.get("study_plan_credit_hours"))
+            if row.get("study_plan_credit_hours") is not None
+            else plan_row.get("credit_hours"),
+            "year_no": _safe_int(row.get("year_no"))
+            if row.get("year_no") is not None
+            else plan_row.get("year_no"),
+            "semester_no": _safe_int(row.get("semester_no"))
+            if row.get("semester_no") is not None
+            else plan_row.get("semester_no"),
+            "category": _safe_str(row.get("category")) or plan_row.get("category", ""),
+            "prerequisites": prerequisites,
+            "status": status,
+            "blocked_by_prerequisite": blocked,
+            "matched": bool(row.get("matched")),
+            "match_type": _safe_str(row.get("match_type")) or "none",
+            "transcript_course_code": transcript_row.get("course_code", "") if transcript_row else _safe_str(row.get("matched_transcript_course_code")),
+            "transcript_course_name": transcript_row.get("course_name", "") if transcript_row else _safe_str(row.get("matched_transcript_course_name")),
+            "transcript_credit_hours": transcript_row.get("credit_hours") if transcript_row else _safe_int(row.get("matched_transcript_credit_hours")),
+            "grade": transcript_row.get("grade", "") if transcript_row else _safe_str(row.get("grade")),
+            "term_taken": transcript_row.get("term_taken", "") if transcript_row else _safe_str(row.get("term_taken")),
+            "notes": _safe_str(row.get("notes")) or plan_row.get("notes", ""),
+        }
+
+        processed.append(merged)
+
+    existing_plan_indices = {row["plan_index"] for row in processed}
+    for plan_row in plan_courses:
+        if plan_row["plan_index"] in existing_plan_indices:
+            continue
+
+        prereqs = plan_row.get("prerequisites", []) or []
+        prereq_codes = [normalize_course_code(p) for p in prereqs if normalize_course_code(p)]
+        blocked = any(code not in completed_codes for code in prereq_codes) if prereq_codes else False
+
+        processed.append(
+            {
+                "plan_index": plan_row["plan_index"],
+                "course_code": plan_row.get("course_code", ""),
+                "course_name": plan_row.get("course_name", ""),
+                "credit_hours": plan_row.get("credit_hours"),
+                "year_no": plan_row.get("year_no"),
+                "semester_no": plan_row.get("semester_no"),
+                "category": plan_row.get("category", ""),
+                "prerequisites": prereqs,
+                "status": "not_completed",
+                "blocked_by_prerequisite": blocked,
+                "matched": False,
+                "match_type": "none",
+                "transcript_course_code": "",
+                "transcript_course_name": "",
+                "transcript_credit_hours": None,
+                "grade": "",
+                "term_taken": "",
+                "notes": plan_row.get("notes", ""),
+            }
+        )
+
+    processed.sort(key=lambda x: (x.get("year_no") or 999, x.get("semester_no") or 999, x.get("plan_index") or 999))
+    return processed
+
+
+def _match_study_plan_courses_with_model(
+    plan_data: dict[str, Any],
+    transcript_data: dict[str, Any],
+) -> list[dict[str, Any]]:
+    plan_courses = _prepare_plan_courses_for_model(plan_data)
+    transcript_courses = _prepare_transcript_courses_for_model(transcript_data)
+
+    if not plan_courses:
+        return []
+
+    if not transcript_courses:
+        return _postprocess_model_merged_rows([], plan_courses, transcript_courses)
+
+    prompt = _model_match_prompt(plan_courses, transcript_courses)
+    model_output = _call_gemini_json(prompt)
+
+    if not isinstance(model_output, list):
+        raise RuntimeError("Gemini comparison output must be a list.")
+
+    return _postprocess_model_merged_rows(model_output, plan_courses, transcript_courses)
+
+
+# =========================
+# Rule-based fallback matcher
+# =========================
+
+def _build_transcript_lookup(transcript_data: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], dict[str, list[dict[str, Any]]]]:
+    by_code: dict[str, dict[str, Any]] = {}
+    by_name: dict[str, list[dict[str, Any]]] = {}
+
+    for c in transcript_data.get("courses", []) or []:
+        code = normalize_course_code(c.get("course_code"))
+        name = normalize_course_name(c.get("course_name")).lower()
+
+        if code:
+            current = by_code.get(code)
+            if current is None:
+                by_code[code] = c
+            else:
+                current_status = _safe_str(current.get("status")).lower()
+                new_status = _safe_str(c.get("status")).lower()
+                priority = {"completed": 3, "in_progress": 2, "not_taken": 1, "": 0}
+                if priority.get(new_status, 0) > priority.get(current_status, 0):
+                    by_code[code] = c
+
+        if name:
+            by_name.setdefault(name, []).append(c)
+
+    return by_code, by_name
+
+
+def _prereq_codes_satisfied(prerequisites: list[str], satisfied_codes: set[str]) -> bool:
+    prereq_codes = [normalize_course_code(p) for p in prerequisites if normalize_course_code(p)]
+    return all(code in satisfied_codes for code in prereq_codes)
+
+
+def _canonical_merged_row(plan_course: dict[str, Any], transcript_course: dict[str, Any] | None, satisfied_codes: set[str]) -> dict[str, Any]:
+    status = "not_completed"
+    grade = ""
+    term_taken = ""
+    transcript_course_code = ""
+    transcript_course_name = ""
+    transcript_credit_hours = None
+    matched = False
+    match_type = "none"
+
+    if transcript_course:
+        matched = True
+        transcript_course_code = _safe_str(transcript_course.get("course_code"))
+        transcript_course_name = _safe_str(transcript_course.get("course_name"))
+        transcript_credit_hours = _safe_int(transcript_course.get("credit_hours"))
+        grade = _safe_str(transcript_course.get("grade"))
+        term_taken = _safe_str(transcript_course.get("term_taken"))
+        status = _safe_str(transcript_course.get("status")).lower() or "not_completed"
+        if status not in {"completed", "in_progress", "not_completed"}:
+            status = "not_completed"
+        match_type = "exact_code" if normalize_course_code(plan_course.get("course_code")) else "name_similarity"
+
+    prerequisites = normalize_prerequisites(plan_course.get("prerequisites"))
+    blocked = False
+    if status == "not_completed" and prerequisites:
+        blocked = not _prereq_codes_satisfied(prerequisites, satisfied_codes)
 
     return {
-        "best_attempts": best_attempts,
-        "failed_codes": failed_codes,
-        "repeated_codes": repeated_codes,
-        "completed_codes": {
-            normalize_course_code(item.get("course_code"))
-            for item in transcript_data.get("courses", [])
-            if item.get("status") in {"completed", "exempt"}
-        },
-        "in_progress_codes": {
-            normalize_course_code(item.get("course_code"))
-            for item in transcript_data.get("courses", [])
-            if item.get("status") == "in_progress"
-        },
+        "course_code": _safe_str(plan_course.get("course_code")),
+        "course_name": _safe_str(plan_course.get("course_name")),
+        "credit_hours": _safe_int(plan_course.get("credit_hours")),
+        "year_no": _safe_int(plan_course.get("year_no")),
+        "semester_no": _safe_int(plan_course.get("semester_no")),
+        "category": _safe_str(plan_course.get("category")),
+        "prerequisites": prerequisites,
+        "status": status,
+        "blocked_by_prerequisite": blocked,
+        "matched": matched,
+        "match_type": match_type,
+        "transcript_course_code": transcript_course_code,
+        "transcript_course_name": transcript_course_name,
+        "transcript_credit_hours": transcript_credit_hours,
+        "grade": grade,
+        "term_taken": term_taken,
+        "notes": _safe_str(plan_course.get("notes")),
     }
-
-
-def _candidate_matches_for_slot(slot_code: str, slot_rule: dict[str, Any], transcript_courses: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    specifics = set(slot_rule.get("specific", []))
-    prefixes = tuple(slot_rule.get("prefixes", []))
-    candidates = []
-    for course in transcript_courses:
-        course_code = normalize_course_code(course.get("course_code"))
-        if course_code == slot_code:
-            continue
-        if course_code in specifics or (prefixes and any(course_code.startswith(prefix) for prefix in prefixes)):
-            candidates.append(course)
-    return sorted(candidates, key=_attempt_sort_key, reverse=True)
-
-
-def _prereq_codes_satisfied(prerequisites: list[str], satisfied_codes: set[str]) -> tuple[bool, list[str]]:
-    missing = [item for item in prerequisites if normalize_course_code(item) not in satisfied_codes]
-    return len(missing) == 0, missing
-
-
-def _canonical_merged_row(plan_course: dict[str, Any], transcript_course: dict[str, Any] | None = None) -> dict[str, Any]:
-    row = dict(plan_course)
-    row["status"] = "not_taken"
-    row["grade"] = ""
-    row["term_taken"] = ""
-    row["source"] = "merged"
-    if transcript_course:
-        row["status"] = transcript_course.get("status") or "not_taken"
-        row["grade"] = str(transcript_course.get("grade") or "").strip()
-        row["term_taken"] = normalize_term(transcript_course.get("term_taken"))
-        if row.get("credit_hours") is None:
-            row["credit_hours"] = transcript_course.get("credit_hours")
-    return row
 
 
 def _match_study_plan_courses(plan_data: dict[str, Any], transcript_data: dict[str, Any]) -> list[dict[str, Any]]:
-    lookup = _build_transcript_lookup(transcript_data)
-    slot_rules = plan_data.get("slot_rules", {})
-    satisfied_for_prereqs = set(lookup["completed_codes"]) | set(lookup["in_progress_codes"])
-    used_slot_matches: set[str] = set()
-    matched_rows: list[dict[str, Any]] = []
+    by_code, by_name = _build_transcript_lookup(transcript_data)
 
-    for course in plan_data.get("courses", []):
-        code_key, name_key = record_match_key(course)
-        transcript_match = lookup["best_attempts"].get(code_key) if code_key else None
-        if transcript_match is None and not code_key and name_key:
-            transcript_match = lookup["best_attempts"].get(name_key)
+    satisfied_codes = {
+        normalize_course_code(c.get("course_code"))
+        for c in transcript_data.get("courses", []) or []
+        if _safe_str(c.get("status")).lower() == "completed" and normalize_course_code(c.get("course_code"))
+    }
 
-        notes: list[str] = []
-        if transcript_match is None and code_key and "X" in code_key:
-            candidates = _candidate_matches_for_slot(code_key, slot_rules.get(code_key, {}), transcript_data.get("courses", []))
-            for candidate in candidates:
-                candidate_code = normalize_course_code(candidate.get("course_code"))
-                if candidate_code in used_slot_matches:
-                    continue
-                transcript_match = candidate
-                used_slot_matches.add(candidate_code)
-                notes.append(f"Matched elective slot with {candidate_code}")
-                break
+    merged_rows: list[dict[str, Any]] = []
+    for plan_course in plan_data.get("courses", []) or []:
+        plan_code = normalize_course_code(plan_course.get("course_code"))
+        plan_name = normalize_course_name(plan_course.get("course_name")).lower()
 
-        row = _canonical_merged_row(course, transcript_match)
+        transcript_course = None
+        if plan_code:
+            transcript_course = by_code.get(plan_code)
+        elif plan_name and by_name.get(plan_name):
+            transcript_course = by_name[plan_name][0]
 
-        if transcript_match:
-            matched_code = normalize_course_code(transcript_match.get("course_code"))
-            if matched_code in lookup["repeated_codes"]:
-                notes.append("Repeated course detected in transcript history")
-            if matched_code in lookup["failed_codes"] and row["status"] in {"completed", "exempt"}:
-                notes.append("Completed after at least one failed attempt")
+        merged_rows.append(_canonical_merged_row(plan_course, transcript_course, satisfied_codes))
 
-        prereq_ok, missing_prereqs = _prereq_codes_satisfied(row.get("prerequisites", []), satisfied_for_prereqs)
-        if row["status"] == "not_taken" and missing_prereqs:
-            row["status"] = "blocked"
-            notes.append("Missing prerequisites: " + ", ".join(missing_prereqs))
-        elif row["status"] == "failed" and prereq_ok:
-            notes.append("Eligible for retake when offered")
-
-        row["notes"] = "; ".join(filter(None, [row.get("notes"), *notes])).strip("; ")
-        matched_rows.append(row)
-
-    return matched_rows
+    return merged_rows
 
 
-def _compute_summary(rows: list[dict[str, Any]], transcript_data: dict[str, Any]) -> dict[str, Any]:
-    credits_required = round(sum(float(row.get("credit_hours") or 0) for row in rows), 2)
-    credits_completed = round(sum(float(row.get("credit_hours") or 0) for row in rows if row.get("status") in {"completed", "exempt"}), 2)
-    credits_in_progress = round(sum(float(row.get("credit_hours") or 0) for row in rows if row.get("status") == "in_progress"), 2)
-    credits_remaining = round(sum(float(row.get("credit_hours") or 0) for row in rows if row.get("status") not in {"completed", "exempt"}), 2)
-    completion_percentage = round((credits_completed / credits_required) * 100, 2) if credits_required else 0.0
+# =========================
+# Combined analysis pipeline
+# =========================
+
+def _compute_summary(merged_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    total = len(merged_rows)
+    completed = sum(1 for r in merged_rows if r.get("status") == "completed")
+    in_progress = sum(1 for r in merged_rows if r.get("status") == "in_progress")
+    blocked = sum(1 for r in merged_rows if r.get("status") == "not_completed" and r.get("blocked_by_prerequisite"))
+    remaining = sum(1 for r in merged_rows if r.get("status") == "not_completed")
+
     return {
-        "credits_required": credits_required,
-        "credits_completed": credits_completed,
-        "credits_in_progress": credits_in_progress,
-        "credits_remaining": credits_remaining,
-        "completion_percentage": completion_percentage,
-        "courses_completed": sum(1 for row in rows if row.get("status") in {"completed", "exempt"}),
-        "courses_in_progress": sum(1 for row in rows if row.get("status") == "in_progress"),
-        "courses_failed": sum(1 for row in rows if row.get("status") == "failed"),
-        "courses_blocked": sum(1 for row in rows if row.get("status") == "blocked"),
-        "courses_remaining": sum(1 for row in rows if row.get("status") in {"not_taken", "blocked", "failed"}),
-        "transcript_course_count": len(transcript_data.get("courses", [])),
+        "total_courses": total,
+        "completed_courses": completed,
+        "in_progress_courses": in_progress,
+        "remaining_courses": remaining,
+        "blocked_courses": blocked,
     }
 
 
-def _eligible_next_semester(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    eligible = []
-    for row in rows:
-        if row.get("status") not in {"not_taken", "failed"}:
-            continue
-        if row.get("status") == "not_taken" and row.get("prerequisites"):
-            continue
-        note = "Retake required" if row.get("status") == "failed" else "Prerequisites satisfied"
-        eligible.append(
-            {
-                "course_code": row.get("course_code"),
-                "course_name": row.get("course_name"),
-                "credit_hours": row.get("credit_hours"),
-                "year_no": row.get("year_no"),
-                "semester_no": row.get("semester_no"),
-                "note": note,
-            }
-        )
-    eligible.sort(key=lambda item: ((item.get("year_no") or 99), (item.get("semester_no") or 99), item.get("course_code") or ""))
-    return eligible
+def _eligible_next_semester(merged_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    eligible = [
+        r for r in merged_rows
+        if r.get("status") == "not_completed" and not r.get("blocked_by_prerequisite")
+    ]
+    eligible.sort(key=lambda x: (x.get("year_no") or 999, x.get("semester_no") or 999, x.get("course_code") or ""))
+    return eligible[:8]
 
 
-def _generate_advice(rows: list[dict[str, Any]], summary: dict[str, Any], transcript_data: dict[str, Any], student: dict[str, Any]) -> list[str]:
-    policy = load_academic_policy()
-    advice = []
+def _generate_advice(merged_rows: list[dict[str, Any]], summary: dict[str, Any]) -> list[str]:
+    advice: list[str] = []
 
-    failed = [row for row in rows if row.get("status") == "failed"]
-    blocked = [row for row in rows if row.get("status") == "blocked"]
-    in_progress = [row for row in rows if row.get("status") == "in_progress"]
-    eligible = _eligible_next_semester(rows)
+    if summary.get("blocked_courses", 0) > 0:
+        advice.append("Some remaining courses are currently blocked by unmet prerequisites.")
 
-    if failed:
-        advice.append(f"Prioritize retaking {', '.join(row['course_code'] for row in failed[:4])} because those credits are still outstanding.")
-    if blocked:
-        advice.append(f"Resolve prerequisite chains first. Currently blocked: {', '.join(row['course_code'] for row in blocked[:4])}.")
+    if summary.get("in_progress_courses", 0) > 0:
+        advice.append("You have courses in progress. Re-run the audit after grades are finalized.")
+
+    eligible = _eligible_next_semester(merged_rows)
     if eligible:
-        advice.append(f"Next-semester eligible options include {', '.join(item['course_code'] for item in eligible[:6])}.")
-    if in_progress:
-        advice.append(f"You have {len(in_progress)} course(s) in progress. Completing them will open more registration options.")
+        codes = [r.get("course_code") or r.get("course_name") for r in eligible[:5]]
+        advice.append(f"Priority candidates for upcoming registration: {', '.join(codes)}.")
 
-    gpa_value = student.get("gpa_final")
-    min_gpa = float(policy.get("graduation_requirements", {}).get("minimum_gpa", 2.0))
-    if isinstance(gpa_value, (int, float)) and gpa_value < min_gpa:
-        advice.append(f"Your cumulative GPA is {gpa_value:.2f}, below the graduation minimum of {min_gpa:.2f}.")
-
-    if summary["completion_percentage"] >= 85:
-        advice.append("You are close to completion; verify capstone, internship, and final electives early.")
-    elif summary["completion_percentage"] < 40:
-        advice.append("Focus on core foundational courses first to avoid future prerequisite bottlenecks.")
-
-    if not advice:
-        advice.append("Your plan is on track. Continue with the earliest unlocked required courses next.")
+    if summary.get("remaining_courses", 0) == 0:
+        advice.append("All study-plan courses appear completed or currently in progress.")
 
     return advice
 
 
-def build_student_snapshot(transcript_data: dict[str, Any], plan_data: dict[str, Any]) -> dict[str, Any]:
-    student = dict(transcript_data.get("student", {}))
-    program = student.get("program") or plan_data.get("program_name") or ""
-    student["program"] = program
-    student["study_plan_program"] = plan_data.get("program_name") or program
-    student["study_plan_catalog"] = plan_data.get("catalog_year") or ""
-    return student
-
-
-def build_study_plan_audit_workbook(artifacts: AnalysisArtifacts, rows: list[dict[str, Any]]) -> Workbook:
+def _build_audit_workbook(merged_rows: list[dict[str, Any]], output_path: str) -> str:
     wb = Workbook()
-    ws_audit = wb.active
-    ws_audit.title = "Study Plan Audit"
-    ws_summary = wb.create_sheet("Summary")
-    ws_eligible = wb.create_sheet("Eligible Next Semester")
-    ws_advice = wb.create_sheet("Personalized Advice")
+    ws = wb.active
+    ws.title = "Study Plan Audit"
 
-    ws_audit.append(["Year", "Semester", "Course Code", "Course Name", "Credits", "Category", "Prerequisites", "Status", "Grade", "Term Taken", "Notes"])
-    for cell in ws_audit[1]:
+    headers = [
+        "Year",
+        "Semester",
+        "Course Code",
+        "Course Name",
+        "Credit Hours",
+        "Prerequisites",
+        "Status",
+        "Grade",
+        "Term Taken",
+        "Matched Transcript Code",
+        "Notes",
+    ]
+    ws.append(headers)
+    for cell in ws[1]:
         cell.font = Font(bold=True)
-        cell.fill = PatternFill("solid", fgColor="D9EAD3")
 
-    for row in rows:
-        ws_audit.append(
+    for row in merged_rows:
+        ws.append(
             [
                 row.get("year_no"),
                 row.get("semester_no"),
                 row.get("course_code"),
                 row.get("course_name"),
                 row.get("credit_hours"),
-                row.get("category"),
-                ", ".join(row.get("prerequisites", [])),
-                STATUS_LABELS.get(row.get("status"), row.get("status")),
+                ", ".join(row.get("prerequisites") or []),
+                row.get("status"),
                 row.get("grade"),
                 row.get("term_taken"),
+                row.get("transcript_course_code"),
                 row.get("notes"),
             ]
         )
-        ws_audit.cell(row=ws_audit.max_row, column=8).fill = PatternFill("solid", fgColor=STATUS_FILLS.get(row.get("status"), "FFFFFF"))
 
-    ws_summary.append(["Field", "Value"])
-    ws_summary["A1"].font = ws_summary["B1"].font = Font(bold=True)
-    for key, value in [
-        ("Student Name", artifacts.student.get("student_name") or ""),
-        ("Student ID", artifacts.student.get("student_id") or ""),
-        ("Program", artifacts.student.get("program") or ""),
-        ("Study Plan Catalog", artifacts.student.get("study_plan_catalog") or ""),
-        ("Credits Required", artifacts.summary.get("credits_required")),
-        ("Credits Completed", artifacts.summary.get("credits_completed")),
-        ("Credits In Progress", artifacts.summary.get("credits_in_progress")),
-        ("Credits Remaining", artifacts.summary.get("credits_remaining")),
-        ("Completion Percentage", artifacts.summary.get("completion_percentage")),
-    ]:
-        ws_summary.append([key, value])
+    for column in ws.columns:
+        max_length = max(len(str(cell.value or "")) for cell in column)
+        ws.column_dimensions[column[0].column_letter].width = min(max(max_length + 2, 12), 48)
 
-    ws_eligible.append(["Course Code", "Course Name", "Credits", "Year", "Semester", "Note"])
-    for cell in ws_eligible[1]:
-        cell.font = Font(bold=True)
-    for item in artifacts.eligible_next_semester:
-        ws_eligible.append(
-            [
-                item.get("course_code"),
-                item.get("course_name"),
-                item.get("credit_hours"),
-                item.get("year_no"),
-                item.get("semester_no"),
-                item.get("note"),
-            ]
-        )
-
-    ws_advice.append(["Advice"])
-    ws_advice["A1"].font = Font(bold=True)
-    for item in artifacts.advice:
-        ws_advice.append([item])
-
-    for ws in wb.worksheets:
-        for column in ws.columns:
-            max_length = max(len(str(cell.value or "")) for cell in column)
-            ws.column_dimensions[column[0].column_letter].width = min(max(max_length + 2, 12), 50)
-
-    return wb
-
-
-def export_study_plan_audit_excel(artifacts: AnalysisArtifacts, rows: list[dict[str, Any]], output_dir: str) -> str:
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, f"study_plan_audit_{uuid.uuid4().hex}.xlsx")
-    build_study_plan_audit_workbook(artifacts, rows).save(output_path)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True) if os.path.dirname(output_path) else None
+    wb.save(output_path)
     return output_path
 
+
+def _infer_total_required_credits(merged_rows: list[dict[str, Any]], fallback: int = 132) -> int:
+    total = 0
+    for row in merged_rows:
+        try:
+            total += int(float(row.get("credit_hours") or 0))
+        except (TypeError, ValueError):
+            continue
+    return total or fallback
 
 def analyze_transcript_and_study_plan_data(
     transcript_data: dict[str, Any],
     plan_data: dict[str, Any],
+    use_model_comparison: bool = True,
     output_dir: str | None = None,
-) -> AnalysisArtifacts:
-    if not transcript_data.get("courses"):
-        raise ValueError("No transcript courses could be extracted from the uploaded transcript.")
-    if not plan_data.get("courses"):
-        raise ValueError("No study plan courses could be extracted from the uploaded study plan.")
+) -> dict[str, Any]:
+    if not use_model_comparison:
+        raise RuntimeError("Model comparison is required, but use_model_comparison=False was passed.")
 
-    student = build_student_snapshot(transcript_data, plan_data)
-    merged_rows = _match_study_plan_courses(plan_data, transcript_data)
-    summary = _compute_summary(merged_rows, transcript_data)
-    advice = _generate_advice(merged_rows, summary, transcript_data, transcript_data.get("student", {}))
-    eligible = _eligible_next_semester(merged_rows)
-    preview_rows = merged_rows[:10]
+    if not GEMINI_API_KEY:
+        raise RuntimeError("GEMINI_API_KEY is not set. Gemini-only comparison cannot run.")
 
-    temp = AnalysisArtifacts(
-        student=student,
-        summary=summary,
-        eligible_next_semester=eligible,
-        advice=advice,
-        preview_rows=preview_rows,
-        excel_path="",
+    merged_rows = _match_study_plan_courses_with_model(plan_data, transcript_data)
+    summary = _compute_summary(merged_rows)
+    advice = _generate_advice(merged_rows, summary)
+    audit_excel_path = ""
+    audit_excel_filename = ""
+    structured_excel_path = ""
+    structured_excel_filename = ""
+
+    if output_dir:
+        audit_excel_path = _build_audit_workbook(
+            merged_rows,
+            os.path.join(output_dir, f"study_plan_audit_{uuid.uuid4().hex}.xlsx"),
+        )
+        audit_excel_filename = os.path.basename(audit_excel_path)
+
+        structured_excel_path = build_structured_study_plan_workbook(
+            merged_rows=merged_rows,
+            output_path=os.path.join(output_dir, f"structured_study_plan_{uuid.uuid4().hex}.xlsx"),
+            program_name=plan_data.get("program_name") or "Study Plan",
+            total_required_credits=_infer_total_required_credits(merged_rows),
+        )
+        structured_excel_filename = os.path.basename(structured_excel_path)
+
+    return {
+        "student": transcript_data.get("student", {}) or {},
+        "study_plan_meta": {
+            "program_name": plan_data.get("program_name", ""),
+            "catalog_year": plan_data.get("catalog_year", ""),
+            "source_type": plan_data.get("source_type", ""),
+        },
+        "comparison_engine": "gemini",
+        "summary": summary,
+        "advice": advice,
+        "merged_rows": merged_rows,
+        "preview_rows": merged_rows[:10],
+        "excel_path": audit_excel_path,
+        "excel_filename": audit_excel_filename,
+        "structured_excel_path": structured_excel_path,
+        "structured_excel_filename": structured_excel_filename,
+    }
+def analyze_transcript_and_study_plan(
+    transcript_file_path: str,
+    study_plan_file_path: str,
+    program_hint: str | None = None,
+    use_model_comparison: bool = True,
+    output_dir: str | None = None,
+    transcript_path: str | None = None,
+    study_plan_path: str | None = None,
+) -> dict[str, Any]:
+    from pdf_extractor import extract_transcript_data
+
+    transcript_file_path = transcript_file_path or transcript_path
+    study_plan_file_path = study_plan_file_path or study_plan_path
+    if not transcript_file_path or not study_plan_file_path:
+        raise ValueError("Both transcript and study plan files are required.")
+
+    print("[1/4] Extracting transcript data...")
+    transcript_data = extract_transcript_data(transcript_file_path)
+    print(f"[1/4] Done. Transcript courses: {len(transcript_data.get('courses', []))}")
+
+    print("[2/4] Extracting study plan with Gemini...")
+    plan_data = analyze_study_plan(study_plan_file_path, program_hint=program_hint)
+    print(f"[2/4] Done. Study plan courses: {len(plan_data.get('courses', []))}")
+
+    print("[3/4] Comparing study plan and transcript with Gemini...")
+    result = analyze_transcript_and_study_plan_data(
+        transcript_data=transcript_data,
+        plan_data=plan_data,
+        use_model_comparison=use_model_comparison,
+        output_dir=output_dir,
     )
-    excel_path = export_study_plan_audit_excel(temp, merged_rows, output_dir) if output_dir else ""
+    print("[3/4] Done.")
 
-    return AnalysisArtifacts(
-        student=student,
-        summary=summary,
-        eligible_next_semester=eligible,
-        advice=advice,
-        preview_rows=preview_rows,
-        excel_path=excel_path,
-    )
+    print("[4/4] Finalizing result...")
+    print("[4/4] Done.")
 
+    return result
 
-def analyze_transcript_and_study_plan(transcript_path: str, study_plan_path: str, output_dir: str) -> AnalysisArtifacts:
-    transcript_data = extract_transcript_data(transcript_path)
-    program_hint = transcript_data.get("student", {}).get("program") or transcript_data.get("major_guess")
-    plan_data = extract_study_plan_data(study_plan_path, program_hint=program_hint)
-    return analyze_transcript_and_study_plan_data(transcript_data, plan_data, output_dir=output_dir)
+# =========================
+# CLI usage
+# =========================
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Analyze a study plan or compare a study plan with a transcript.")
+    parser.add_argument("study_plan_file", help="Path to the study plan file")
+    parser.add_argument("--program", default="", help="Optional program hint")
+    parser.add_argument("--transcript", default="", help="Optional transcript file path for comparison")
+    parser.add_argument("--no-model-compare", action="store_true", help="Disable Gemini model comparison and use rule-based matching")
+    args = parser.parse_args()
+
+    if args.transcript:
+        result = analyze_transcript_and_study_plan(
+            transcript_file_path=args.transcript,
+            study_plan_file_path=args.study_plan_file,
+            program_hint=args.program or None,
+            use_model_comparison=not args.no_model_compare,
+        )
+    else:
+        result = analyze_study_plan(args.study_plan_file, program_hint=args.program or None)
+
+    print(json.dumps(result, ensure_ascii=False, indent=2))

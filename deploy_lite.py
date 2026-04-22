@@ -313,12 +313,21 @@ def api_analyze_study_plan():
     return jsonify(
         {
             "success": True,
-            "student": artifacts.student,
-            "summary": artifacts.summary,
-            "eligible_next_semester": artifacts.eligible_next_semester,
-            "advice": artifacts.advice,
-            "excel_file": f"/download-report/{os.path.basename(artifacts.excel_path)}",
-            "preview_rows": artifacts.preview_rows,
+            "student": artifacts.get("student", {}),
+            "summary": artifacts.get("summary", {}),
+            "eligible_next_semester": [
+                {
+                    "course_code": row.get("course_code"),
+                    "course_name": row.get("course_name"),
+                    "credit_hours": row.get("credit_hours"),
+                }
+                for row in artifacts.get("merged_rows", [])
+                if row.get("status") == "not_completed" and not row.get("blocked_by_prerequisite")
+            ][:8],
+            "advice": artifacts.get("advice", []),
+            "excel_file": f"/download-report/{artifacts.get('excel_filename')}" if artifacts.get("excel_filename") else None,
+            "download_structured_excel_url": f"/download-report/{artifacts.get('structured_excel_filename')}" if artifacts.get("structured_excel_filename") else None,
+            "preview_rows": artifacts.get("preview_rows", []),
         }
     )
 

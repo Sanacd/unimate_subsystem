@@ -1,0 +1,63 @@
+🚀 App started
+MODE: DEV
+BASE_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask
+FRONTEND_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+STATIC_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+UPLOAD_FOLDER: C:\Users\sana_\Downloads\unimate_subsystem\flask\uploads
+🚀 Starting Flask server from main block...
+🚀 App started
+MODE: DEV
+BASE_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask
+FRONTEND_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+STATIC_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+UPLOAD_FOLDER: C:\Users\sana_\Downloads\unimate_subsystem\flask\uploads
+🚀 Starting Flask server from main block...
+🚀 App started
+MODE: DEV
+BASE_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask
+FRONTEND_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+STATIC_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+UPLOAD_FOLDER: C:\Users\sana_\Downloads\unimate_subsystem\flask\uploads
+🚀 Starting Flask server from main block...
+🚀 App started
+MODE: DEV
+BASE_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask
+FRONTEND_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+STATIC_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+UPLOAD_FOLDER: C:\Users\sana_\Downloads\unimate_subsystem\flask\uploads
+🚀 Starting Flask server from main block...
+🚀 App started
+MODE: DEV
+BASE_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask
+FRONTEND_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+STATIC_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+UPLOAD_FOLDER: C:\Users\sana_\Downloads\unimate_subsystem\flask\uploads
+🚀 Starting Flask server from main block...
+🚀 App started
+MODE: DEV
+BASE_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask
+FRONTEND_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+STATIC_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+UPLOAD_FOLDER: C:\Users\sana_\Downloads\unimate_subsystem\flask\uploads
+🚀 Starting Flask server from main block...
+🚀 App started
+MODE: DEV
+BASE_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask
+FRONTEND_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+STATIC_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+UPLOAD_FOLDER: C:\Users\sana_\Downloads\unimate_subsystem\flask\uploads
+🚀 Starting Flask server from main block...
+🚀 App started
+MODE: DEV
+BASE_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask
+FRONTEND_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+STATIC_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+UPLOAD_FOLDER: C:\Users\sana_\Downloads\unimate_subsystem\flask\uploads
+🚀 Starting Flask server from main block...
+🚀 App started
+MODE: DEV
+BASE_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask
+FRONTEND_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+STATIC_DIR: C:\Users\sana_\Downloads\unimate_subsystem\flask\..\node\public
+UPLOAD_FOLDER: C:\Users\sana_\Downloads\unimate_subsystem\flask\uploads
+🚀 Starting Flask server from main block...

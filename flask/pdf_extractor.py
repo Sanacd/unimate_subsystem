@@ -4,6 +4,7 @@ import pdfplumber
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment, PatternFill
+from course_normalizer import normalize_course_record
 
 # =========================================================
 # 1️⃣ TEXT UTILITIES
@@ -391,6 +392,8 @@ def _term_for_position(position: int, markers: list[tuple[int, str]]) -> str:
 
 def _classify_transcript_status(grade_raw, points_raw) -> str:
     grade_text = str(grade_raw or "").strip().upper()
+    if grade_text in {"WAIVED", "WAIVE", "TR", "TRANSFER"}:
+        return "exempt"
     if grade_text in {"IP", "I", "IN PROGRESS", "INPROGRESS"}:
         return "in_progress"
     if grade_text in {"F", "FA", "NF"}:
@@ -431,18 +434,21 @@ def extract_transcript_data(file_path: str) -> dict:
         except (TypeError, ValueError):
             points = 0.0
 
-        courses.append(
+        record = normalize_course_record(
             {
                 "course_code": code,
                 "course_name": title,
-                "credits": credits,
+                "credit_hours": credits,
                 "grade": grade,
-                "points": points,
                 "status": _classify_transcript_status(grade, points),
                 "term_taken": _term_for_position(match.start(), term_markers),
                 "notes": "",
-            }
+            },
+            source="transcript",
         )
+        if record:
+            record["points"] = points
+            courses.append(record)
 
     if not courses:
         df_courses = parse_courses_with_multiline_fix(text)
@@ -450,18 +456,21 @@ def extract_transcript_data(file_path: str) -> dict:
             code = re.sub(r"[^A-Z0-9]", "", str(row.get("Course Code") or "").upper())
             grade = str(row.get("Grade") or "").strip()
             points = row.get("Points") or 0.0
-            courses.append(
+            record = normalize_course_record(
                 {
                     "course_code": code,
                     "course_name": str(row.get("Course Title") or "").strip(),
-                    "credits": float(row.get("Credit Hours") or 0),
+                    "credit_hours": float(row.get("Credit Hours") or 0),
                     "grade": grade,
-                    "points": float(points or 0),
                     "status": _classify_transcript_status(grade, points),
                     "term_taken": "",
                     "notes": "",
-                }
+                },
+                source="transcript",
             )
+            if record:
+                record["points"] = float(points or 0)
+                courses.append(record)
 
     gpa_df = extract_gpa_summary_v3(text)
     gpa_final = None

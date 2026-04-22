@@ -122,6 +122,7 @@ sys.modules["app"] = app_shim
 
 from agents_runtime import StudentState, load_student_state, save_student_state, ui_agent_handle_upload
 from shared_tools import build_chat_fallback, generate_llm_response
+from studyplan_analyzer import analyze_transcript_and_study_plan
 
 with open(os.path.join(LEGACY_DIR, "academic_policy.json"), "r", encoding="utf-8") as f:
     ACADEMIC_POLICY = json.load(f)
@@ -263,6 +264,14 @@ def _build_upload_response(file_storage):
     return response
 
 
+def _save_uploaded_file(file_storage, label: str) -> str:
+    ext = os.path.splitext(file_storage.filename or "")[1] or ".bin"
+    safe_name = f"{label}_{uuid.uuid4().hex}{ext}"
+    path = os.path.join(UPLOAD_FOLDER, safe_name)
+    file_storage.save(path)
+    return path
+
+
 @app.route("/api/upload-transcript", methods=["POST", "OPTIONS"])
 def api_upload_transcript():
     if request.method == "OPTIONS":
@@ -272,6 +281,46 @@ def api_upload_transcript():
     if not file:
         return jsonify({"error": "No file uploaded"}), 400
     return _build_upload_response(file)
+
+
+@app.route("/api/analyze-study-plan", methods=["POST", "OPTIONS"])
+def api_analyze_study_plan():
+    if request.method == "OPTIONS":
+        return ("", 204)
+
+    transcript_file = request.files.get("transcript")
+    study_plan_file = request.files.get("study_plan")
+
+    if not transcript_file:
+        return jsonify({"success": False, "error": "Transcript file is required."}), 400
+    if not study_plan_file:
+        return jsonify({"success": False, "error": "Study plan file is required."}), 400
+
+    transcript_path = _save_uploaded_file(transcript_file, "transcript")
+    study_plan_path = _save_uploaded_file(study_plan_file, "study_plan")
+
+    try:
+        artifacts = analyze_transcript_and_study_plan(
+            transcript_path=transcript_path,
+            study_plan_path=study_plan_path,
+            output_dir=UPLOAD_FOLDER,
+        )
+    except ValueError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
+    except Exception as exc:
+        return jsonify({"success": False, "error": f"Study plan analysis failed: {exc}"}), 500
+
+    return jsonify(
+        {
+            "success": True,
+            "student": artifacts.student,
+            "summary": artifacts.summary,
+            "eligible_next_semester": artifacts.eligible_next_semester,
+            "advice": artifacts.advice,
+            "excel_file": f"/download-report/{os.path.basename(artifacts.excel_path)}",
+            "preview_rows": artifacts.preview_rows,
+        }
+    )
 
 
 @app.route("/agents/upload", methods=["POST"])

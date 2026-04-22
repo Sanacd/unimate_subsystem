@@ -1,3 +1,4 @@
+import os
 import re
 import pdfplumber
 import pandas as pd
@@ -350,6 +351,136 @@ def save_to_excel(student_info, df_all, df_prep, df_ug, df_inprog, df_waived,
             df_gpa_ug.to_excel(writer, sheet_name="GPA_Undergrad", index=False)
     style_excel(output_path)
     print(f"✅ Excel file created successfully → {output_path}")
+
+
+def _extract_text_from_supported_file(file_path: str) -> str:
+    ext = os.path.splitext(file_path)[1].lower()
+    if ext == ".pdf":
+        return clean_text(extract_text(file_path))
+    with open(file_path, "r", encoding="utf-8") as fh:
+        return clean_text(fh.read())
+
+
+def _extract_term_markers(text: str) -> list[tuple[int, str]]:
+    markers = []
+    patterns = [
+        re.compile(r"Acad\s*Year\s+(\d{4}\s*-\s*\d{4})\s+(Fall|Spring|Summer)", re.I),
+        re.compile(r"\b(Fall|Spring|Summer)\s+(20\d{2})\b", re.I),
+    ]
+
+    for pattern in patterns:
+        for match in pattern.finditer(text):
+            if "Acad" in pattern.pattern:
+                term = f"{match.group(2).title()} {match.group(1).strip()}"
+            else:
+                term = f"{match.group(1).title()} {match.group(2)}"
+            markers.append((match.start(), term))
+
+    return sorted(markers, key=lambda item: item[0])
+
+
+def _term_for_position(position: int, markers: list[tuple[int, str]]) -> str:
+    term = ""
+    for marker_pos, marker_term in markers:
+        if marker_pos <= position:
+            term = marker_term
+        else:
+            break
+    return term
+
+
+def _classify_transcript_status(grade_raw, points_raw) -> str:
+    grade_text = str(grade_raw or "").strip().upper()
+    if grade_text in {"IP", "I", "IN PROGRESS", "INPROGRESS"}:
+        return "in_progress"
+    if grade_text in {"F", "FA", "NF"}:
+        return "failed"
+    if grade_text in {"W", "WF", "WP", "WITHDRAWN"}:
+        return "not_taken"
+    try:
+        if float(points_raw or 0) > 0:
+            return "completed"
+    except (TypeError, ValueError):
+        pass
+    if grade_text and grade_text not in {"0", "0.0", "0.00"}:
+        return "completed"
+    return "in_progress"
+
+
+def extract_transcript_data(file_path: str) -> dict:
+    text = _extract_text_from_supported_file(file_path)
+    student_info = parse_student_info_v3(text)
+    term_markers = _extract_term_markers(text)
+
+    course_pattern = re.compile(
+        r"([A-Z]{2,6}\s*[-]?\s*\d{3}[A-Z]?)\s+([A-Za-z0-9 ,()â€™'â€“\-/]+?)\s+(\d+(?:\.\d+)?)\s+(?:([A-Z\+]+|Waived|0\.00|0\.0|W|IP|I))?\s*(\d+(?:\.\d+)?)?",
+        re.M,
+    )
+
+    courses = []
+    for match in course_pattern.finditer(text):
+        code = re.sub(r"[^A-Z0-9]", "", match.group(1).upper())
+        title = re.sub(r"\s+", " ", match.group(2)).strip().title()
+        try:
+            credits = float(match.group(3))
+        except (TypeError, ValueError):
+            credits = 0.0
+        grade = (match.group(4) or "").strip()
+        try:
+            points = float(match.group(5)) if match.group(5) else 0.0
+        except (TypeError, ValueError):
+            points = 0.0
+
+        courses.append(
+            {
+                "course_code": code,
+                "course_name": title,
+                "credits": credits,
+                "grade": grade,
+                "points": points,
+                "status": _classify_transcript_status(grade, points),
+                "term_taken": _term_for_position(match.start(), term_markers),
+                "notes": "",
+            }
+        )
+
+    if not courses:
+        df_courses = parse_courses_with_multiline_fix(text)
+        for row in df_courses.to_dict("records"):
+            code = re.sub(r"[^A-Z0-9]", "", str(row.get("Course Code") or "").upper())
+            grade = str(row.get("Grade") or "").strip()
+            points = row.get("Points") or 0.0
+            courses.append(
+                {
+                    "course_code": code,
+                    "course_name": str(row.get("Course Title") or "").strip(),
+                    "credits": float(row.get("Credit Hours") or 0),
+                    "grade": grade,
+                    "points": float(points or 0),
+                    "status": _classify_transcript_status(grade, points),
+                    "term_taken": "",
+                    "notes": "",
+                }
+            )
+
+    gpa_df = extract_gpa_summary_v3(text)
+    gpa_final = None
+    if not gpa_df.empty:
+        try:
+            gpa_final = float(gpa_df["Cumulative GPA"].astype(float).iloc[-1])
+        except Exception:
+            gpa_final = None
+
+    return {
+        "student": {
+            "student_name": student_info.get("Name") or "",
+            "student_id": student_info.get("Student ID") or "",
+            "program": student_info.get("Undergraduate College") or "",
+            "gpa_final": gpa_final,
+        },
+        "courses": courses,
+        "gpa_table": gpa_df.to_dict("records") if hasattr(gpa_df, "to_dict") else [],
+    }
 
 
 # =========================================================

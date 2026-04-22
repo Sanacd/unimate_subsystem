@@ -821,6 +821,14 @@ import pandas as pd
 from agents_runtime import _save_state
 from pdf_extractor import extract_text, clean_text, parse_courses_with_multiline_fix, extract_gpa_summary_v3
 from shared_tools import compare_transcript_with_plan
+from studyplan_analyzer import analyze_transcript_and_study_plan
+
+
+def _save_named_upload(file_storage, label: str) -> str:
+    ext = os.path.splitext(file_storage.filename or "")[1] or ".bin"
+    path = os.path.join(UPLOAD_FOLDER, f"{label}_{uuid.uuid4().hex}{ext}")
+    file_storage.save(path)
+    return path
 
 @app.route("/upload", methods=["POST"])
 def upload_transcript():
@@ -921,6 +929,43 @@ def upload_transcript():
         import traceback
         traceback.print_exc()
         return jsonify({"response": f"❌ Error processing file: {e}"}), 500
+
+@app.route("/api/analyze-study-plan", methods=["POST"])
+def analyze_study_plan():
+    transcript_file = request.files.get("transcript")
+    study_plan_file = request.files.get("study_plan")
+
+    if not transcript_file:
+        return jsonify({"success": False, "error": "Transcript file is required."}), 400
+    if not study_plan_file:
+        return jsonify({"success": False, "error": "Study plan file is required."}), 400
+
+    transcript_path = _save_named_upload(transcript_file, "transcript")
+    study_plan_path = _save_named_upload(study_plan_file, "study_plan")
+
+    try:
+        artifacts = analyze_transcript_and_study_plan(
+            transcript_path=transcript_path,
+            study_plan_path=study_plan_path,
+            output_dir=UPLOAD_FOLDER,
+        )
+    except ValueError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
+    except Exception as exc:
+        traceback.print_exc()
+        return jsonify({"success": False, "error": f"Study plan analysis failed: {exc}"}), 500
+
+    return jsonify(
+        {
+            "success": True,
+            "student": artifacts.student,
+            "summary": artifacts.summary,
+            "eligible_next_semester": artifacts.eligible_next_semester,
+            "advice": artifacts.advice,
+            "excel_file": f"/download-report/{os.path.basename(artifacts.excel_path)}",
+            "preview_rows": artifacts.preview_rows,
+        }
+    )
 
 # ----------------------------------------------------------
 # ROUTES

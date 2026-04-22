@@ -201,6 +201,13 @@ display:flex;
 gap:10px;
 }
 
+.file-pickers{
+display:flex;
+gap:10px;
+margin-bottom:12px;
+flex-wrap:wrap;
+}
+
 input{
 flex:1;
 height:55px;
@@ -227,6 +234,26 @@ color:white;
 
 .send-btn{
 background:#d4af57;
+}
+
+.file-btn{
+border:none;
+border-radius:14px;
+padding:12px 16px;
+cursor:pointer;
+background:#233f73;
+color:white;
+font-weight:bold;
+}
+
+.file-btn.secondary{
+background:#5a6f94;
+}
+
+.file-status{
+font-size:13px;
+color:#4a5870;
+padding:0 4px;
 }
 
 </style>
@@ -283,13 +310,21 @@ UPM University
 
 <div class="input-wrap">
 
+<div class="file-pickers">
+<input type="file" id="transcriptFile" accept=".pdf,.txt" hidden>
+<input type="file" id="studyPlanFile" accept=".pdf,.docx,.txt,.json,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.bmp,.tif,.tiff,.webp" hidden>
+
+<button class="file-btn" type="button" onclick="document.getElementById('transcriptFile').click()">Transcript File</button>
+<button class="file-btn secondary" type="button" onclick="document.getElementById('studyPlanFile').click()">Study Plan File</button>
+</div>
+
+<div class="file-status" id="fileStatus">Select both a transcript and a study plan file to analyze.</div>
+
 <div class="input-area">
 
-<input type="file" id="transcriptFile" accept=".pdf" hidden>
-
-<button class="sound-btn" id="uploadBtn" type="button" onclick="document.getElementById('transcriptFile').click()">📎</button>
-
 <input id="input" placeholder="Ask your academic advisor...">
+
+<button class="sound-btn" id="uploadBtn" type="button" onclick="uploadStudyPlanAnalysis()">📎</button>
 
 <button class="send-btn" id="sendBtn" onclick="send()">➤</button>
 
@@ -307,6 +342,8 @@ const messages=document.getElementById("messages")
 const input=document.getElementById("input")
 const sendBtn=document.getElementById("sendBtn")
 const transcriptFile=document.getElementById("transcriptFile")
+const studyPlanFile=document.getElementById("studyPlanFile")
+const fileStatus=document.getElementById("fileStatus")
 
 /* URLS */
 
@@ -335,6 +372,29 @@ if(!sessionId){
 /* MESSAGE LOCK */
 
 let sending=false
+let uploadingAnalysis=false
+
+function updateFileStatus(){
+const transcriptName = transcriptFile.files[0]?.name
+const studyPlanName = studyPlanFile.files[0]?.name
+
+if(transcriptName && studyPlanName){
+  fileStatus.textContent = `Ready to analyze: transcript "${transcriptName}" and study plan "${studyPlanName}".`
+  return
+}
+
+if(transcriptName){
+  fileStatus.textContent = `Transcript selected: "${transcriptName}". Select a study plan file next.`
+  return
+}
+
+if(studyPlanName){
+  fileStatus.textContent = `Study plan selected: "${studyPlanName}". Select a transcript file next.`
+  return
+}
+
+fileStatus.textContent = "Select both a transcript and a study plan file to analyze."
+}
 
 /* SIDEBAR TOGGLE */
 
@@ -489,22 +549,36 @@ addHistory()
 
 /* SUBSYSTEM UPLOAD */
 
-transcriptFile.addEventListener("change", async (e) => {
+transcriptFile.addEventListener("change", updateFileStatus)
+studyPlanFile.addEventListener("change", updateFileStatus)
 
-const file = e.target.files[0]
-if(!file) return
+async function uploadStudyPlanAnalysis(){
 
-addUserMessage("Uploading transcript...")
+if(uploadingAnalysis) return
+
+const transcript = transcriptFile.files[0]
+const studyPlan = studyPlanFile.files[0]
+
+if(!transcript || !studyPlan){
+  addBotMessage("Please select both a transcript file and a study plan file before uploading.")
+  return
+}
+
+uploadingAnalysis = true
+fileStatus.textContent = "Uploading transcript and study plan for analysis..."
+
+addUserMessage(`Analyzing transcript "${transcript.name}" with study plan "${studyPlan.name}"...`)
 
 const formData = new FormData()
-formData.append("file", file)
+formData.append("transcript", transcript)
+formData.append("study_plan", studyPlan)
 formData.append("sessionId", sessionId)
 formData.append("studentId", localStorage.getItem("studentID") || "")
 formData.append("studentName", localStorage.getItem("studentName") || "")
 
 try{
 
-const res = await fetch(`${SUBSYSTEM_URL}/api/upload-transcript`, {
+const res = await fetch(`${SUBSYSTEM_URL}/api/analyze-study-plan`, {
 method:"POST",
 body: formData
 })
@@ -519,40 +593,55 @@ if(res.ok){
   localStorage.setItem("transcriptReady", "true")
   localStorage.setItem("subsystemData", JSON.stringify(data))
 
-  const statusMsg =
-    data.ui_summary ||
-    data.message ||
-    data.output ||
-    data.reply ||
-    "Transcript uploaded successfully."
+  addBotMessage(data.message || "Transcript and study plan analyzed successfully.")
 
-  addBotMessage(statusMsg)
-
-  if (data.alert) {
-    addBotMessage(data.alert)
+  if (data.summary) {
+    const summary = data.summary
+    addBotMessage(
+      "Summary:\n" +
+      `Completed Credits: ${summary.credits_completed ?? 0}\n` +
+      `In Progress Credits: ${summary.credits_in_progress ?? 0}\n` +
+      `Remaining Credits: ${summary.credits_remaining ?? 0}\n` +
+      `Completion: ${summary.completion_percentage ?? 0}%`
+    )
   }
 
-  if (Array.isArray(data.remaining_courses) && data.remaining_courses.length) {
-    addBotMessage("Remaining courses:\n" + data.remaining_courses.join("\n"))
+  if (Array.isArray(data.advice) && data.advice.length) {
+    addBotMessage("Personalized Advice:\n" + data.advice.join("\n"))
   }
 
-  if (data.excel_path) {
-    addBotMessage("Download your study plan report:\n" + SUBSYSTEM_URL + data.excel_path)
+  if (Array.isArray(data.eligible_next_semester) && data.eligible_next_semester.length) {
+    addBotMessage(
+      "Eligible Next Semester:\n" +
+      data.eligible_next_semester
+        .map(item => `${item.course_code} - ${item.course_name}`)
+        .join("\n")
+    )
   }
+
+  if (data.excel_file) {
+    addBotMessage("Download your study plan report:\n" + SUBSYSTEM_URL + data.excel_file)
+  }
+
+  transcriptFile.value = ""
+  studyPlanFile.value = ""
+  updateFileStatus()
 }else{
-  addBotMessage(data.error || "Transcript upload failed.")
+  addBotMessage(data.error || "Study plan analysis failed.")
+  updateFileStatus()
 }
 
 }catch(err){
 
 console.error(err)
-addBotMessage("Connection error with the transcript subsystem.")
+addBotMessage("Connection error with the study plan analysis service.")
+updateFileStatus()
 
+}finally{
+uploadingAnalysis = false
 }
 
-e.target.value = ""
-
-})
+}
 
 /* SEND MESSAGE TO n8n */
 
@@ -664,6 +753,7 @@ window.addEventListener("load",()=>{
 
 askStudent()
 addHistory()
+updateFileStatus()
 
 // ===== Show welcome ONLY if no history =====
 if(chatHistory.length === 0){
